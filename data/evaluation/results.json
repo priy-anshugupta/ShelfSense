@@ -1,0 +1,336 @@
+{
+  "status": "measured",
+  "timestamp": "2026-10-08T15:11:23.168406+00:00",
+  "catalog_size": 40,
+  "requests": 12,
+  "engine": "sentence-transformer-hybrid",
+  "notice": "Project-authored 12-query gold set on a 40-title demonstration catalog. No held-out interaction dataset or human usability study. Relevance labels are a small illustrative evaluation, not independent evidence of general superiority. Latency is warm/local except for the first model load.",
+  "hybrid": {
+    "precision_at_5": 0.433,
+    "ndcg_at_5": 0.939,
+    "coverage": 0.8,
+    "mean_latency_ms": 2196.46
+  },
+  "tfidf": {
+    "precision_at_5": 0.417,
+    "ndcg_at_5": 0.936
+  },
+  "rows": [
+    {
+      "query": "space survival problem solving",
+      "relevant_ids": [
+        "martian",
+        "project-hail-mary"
+      ],
+      "hybrid_ids": [
+        "martian",
+        "project-hail-mary",
+        "algorithms-live",
+        "station-eleven",
+        "ai-modern"
+      ],
+      "tfidf_ids": [
+        "martian",
+        "project-hail-mary",
+        "grokking-algorithms",
+        "murder-roger",
+        "algorithms-live"
+      ],
+      "precision_at_5": 0.4,
+      "ndcg_at_5": 1.0,
+      "tfidf_precision_at_5": 0.4,
+      "tfidf_ndcg_at_5": 1.0,
+      "latency_ms": 21368.43
+    },
+    {
+      "query": "beginner artificial intelligence",
+      "relevant_ids": [
+        "ai-guide",
+        "ai-modern",
+        "hands-on-ml"
+      ],
+      "hybrid_ids": [
+        "ai-guide",
+        "ai-modern",
+        "python-crash",
+        "grokking-algorithms",
+        "hands-on-ml"
+      ],
+      "tfidf_ids": [
+        "ai-guide",
+        "ai-modern",
+        "hands-on-ml",
+        "python-crash",
+        "grokking-algorithms"
+      ],
+      "precision_at_5": 0.6,
+      "ndcg_at_5": 0.947,
+      "tfidf_precision_at_5": 0.6,
+      "tfidf_ndcg_at_5": 1.0,
+      "latency_ms": 255.63
+    },
+    {
+      "query": "learn python programming",
+      "relevant_ids": [
+        "python-crash",
+        "hands-on-ml"
+      ],
+      "hybrid_ids": [
+        "python-crash",
+        "hands-on-ml",
+        "ai-guide",
+        "grokking-algorithms",
+        "algorithms-live"
+      ],
+      "tfidf_ids": [
+        "python-crash",
+        "hands-on-ml",
+        "grokking-algorithms",
+        "zero-one",
+        "station-eleven"
+      ],
+      "precision_at_5": 0.4,
+      "ndcg_at_5": 1.0,
+      "tfidf_precision_at_5": 0.4,
+      "tfidf_ndcg_at_5": 1.0,
+      "latency_ms": 322.62
+    },
+    {
+      "query": "detective mystery clues",
+      "relevant_ids": [
+        "murder-roger",
+        "thursday-murder",
+        "silent-patient"
+      ],
+      "hybrid_ids": [
+        "murder-roger",
+        "thursday-murder",
+        "silent-patient",
+        "piranesi",
+        "project-hail-mary"
+      ],
+      "tfidf_ids": [
+        "murder-roger",
+        "thursday-murder",
+        "silent-patient",
+        "piranesi",
+        "project-hail-mary"
+      ],
+      "precision_at_5": 0.6,
+      "ndcg_at_5": 1.0,
+      "tfidf_precision_at_5": 0.6,
+      "tfidf_ndcg_at_5": 1.0,
+      "latency_ms": 316.19
+    },
+    {
+      "query": "habits productivity focus",
+      "relevant_ids": [
+        "atomic-habits",
+        "deep-work",
+        "ikigai"
+      ],
+      "hybrid_ids": [
+        "atomic-habits",
+        "deep-work",
+        "ikigai",
+        "psychology-money",
+        "design-everyday"
+      ],
+      "tfidf_ids": [
+        "deep-work",
+        "atomic-habits",
+        "ikigai",
+        "zero-one",
+        "silent-patient"
+      ],
+      "precision_at_5": 0.6,
+      "ndcg_at_5": 1.0,
+      "tfidf_precision_at_5": 0.6,
+      "tfidf_ndcg_at_5": 1.0,
+      "latency_ms": 658.82
+    },
+    {
+      "query": "friendship hopeful short",
+      "relevant_ids": [
+        "little-prince",
+        "alchemist",
+        "before-coffee"
+      ],
+      "hybrid_ids": [
+        "little-prince",
+        "beautiful-world",
+        "midnight-library",
+        "before-coffee",
+        "kite-runner"
+      ],
+      "tfidf_ids": [
+        "before-coffee",
+        "little-prince",
+        "alchemist",
+        "ikigai",
+        "ocean-end"
+      ],
+      "precision_at_5": 0.4,
+      "ndcg_at_5": 0.671,
+      "tfidf_precision_at_5": 0.6,
+      "tfidf_ndcg_at_5": 1.0,
+      "latency_ms": 1526.65
+    },
+    {
+      "query": "cosmology universe physics",
+      "relevant_ids": [
+        "brief-history-time"
+      ],
+      "hybrid_ids": [
+        "brief-history-time",
+        "project-hail-mary",
+        "martian",
+        "hands-on-ml",
+        "sapiens"
+      ],
+      "tfidf_ids": [
+        "brief-history-time",
+        "zero-one",
+        "thinking-fast",
+        "thursday-murder",
+        "silent-patient"
+      ],
+      "precision_at_5": 0.2,
+      "ndcg_at_5": 1.0,
+      "tfidf_precision_at_5": 0.2,
+      "tfidf_ndcg_at_5": 1.0,
+      "latency_ms": 276.4
+    },
+    {
+      "query": "design usability everyday products",
+      "relevant_ids": [
+        "design-everyday"
+      ],
+      "hybrid_ids": [
+        "design-everyday",
+        "atomic-habits",
+        "algorithms-live",
+        "creative-act",
+        "ikigai"
+      ],
+      "tfidf_ids": [
+        "design-everyday",
+        "creative-act",
+        "ikigai",
+        "a-room",
+        "algorithms-live"
+      ],
+      "precision_at_5": 0.2,
+      "ndcg_at_5": 1.0,
+      "tfidf_precision_at_5": 0.2,
+      "tfidf_ndcg_at_5": 1.0,
+      "latency_ms": 342.94
+    },
+    {
+      "query": "creativity art writing",
+      "relevant_ids": [
+        "creative-act",
+        "a-room",
+        "design-everyday"
+      ],
+      "hybrid_ids": [
+        "a-room",
+        "creative-act",
+        "station-eleven",
+        "alchemist",
+        "silent-patient"
+      ],
+      "tfidf_ids": [
+        "a-room",
+        "creative-act",
+        "station-eleven",
+        "zero-one",
+        "silent-patient"
+      ],
+      "precision_at_5": 0.4,
+      "ndcg_at_5": 0.765,
+      "tfidf_precision_at_5": 0.4,
+      "tfidf_ndcg_at_5": 0.765,
+      "latency_ms": 347.21
+    },
+    {
+      "query": "history humanity society",
+      "relevant_ids": [
+        "sapiens",
+        "1984",
+        "animal-farm"
+      ],
+      "hybrid_ids": [
+        "sapiens",
+        "station-eleven",
+        "1984",
+        "midnight-library",
+        "animal-farm"
+      ],
+      "tfidf_ids": [
+        "sapiens",
+        "kite-runner",
+        "brief-history-time",
+        "book-thief",
+        "man-search"
+      ],
+      "precision_at_5": 0.6,
+      "ndcg_at_5": 0.885,
+      "tfidf_precision_at_5": 0.2,
+      "tfidf_ndcg_at_5": 0.469,
+      "latency_ms": 316.36
+    },
+    {
+      "query": "algorithms computer science decisions",
+      "relevant_ids": [
+        "algorithms-live",
+        "grokking-algorithms"
+      ],
+      "hybrid_ids": [
+        "algorithms-live",
+        "grokking-algorithms",
+        "ai-modern",
+        "hands-on-ml",
+        "ai-guide"
+      ],
+      "tfidf_ids": [
+        "algorithms-live",
+        "grokking-algorithms",
+        "psychology-money",
+        "martian",
+        "brief-history-time"
+      ],
+      "precision_at_5": 0.4,
+      "ndcg_at_5": 1.0,
+      "tfidf_precision_at_5": 0.4,
+      "tfidf_ndcg_at_5": 1.0,
+      "latency_ms": 289.91
+    },
+    {
+      "query": "memoir education resilience",
+      "relevant_ids": [
+        "educated",
+        "man-search"
+      ],
+      "hybrid_ids": [
+        "educated",
+        "man-search",
+        "midnight-library",
+        "station-eleven",
+        "a-room"
+      ],
+      "tfidf_ids": [
+        "educated",
+        "man-search",
+        "zero-one",
+        "thursday-murder",
+        "silent-patient"
+      ],
+      "precision_at_5": 0.4,
+      "ndcg_at_5": 1.0,
+      "tfidf_precision_at_5": 0.4,
+      "tfidf_ndcg_at_5": 1.0,
+      "latency_ms": 336.36
+    }
+  ]
+}
