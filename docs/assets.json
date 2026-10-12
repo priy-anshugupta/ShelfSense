@@ -1,0 +1,294 @@
+[
+  {
+    "id": "midnight-library",
+    "source": "https://covers.openlibrary.org/b/isbn/9780525559474-M.jpg?default=false",
+    "isbn": "9780525559474",
+    "path": "/images/covers/midnight-library.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "beautiful-world",
+    "source": "https://covers.openlibrary.org/b/isbn/9780374602604-M.jpg?default=false",
+    "isbn": "9780374602604",
+    "path": "/images/covers/beautiful-world.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "educated",
+    "source": "https://covers.openlibrary.org/b/isbn/9780399590504-M.jpg?default=false",
+    "isbn": "9780399590504",
+    "path": "/images/covers/educated.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "atomic-habits",
+    "source": "https://covers.openlibrary.org/b/isbn/9780735211292-M.jpg?default=false",
+    "isbn": "9780735211292",
+    "path": "/images/covers/atomic-habits.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "alchemist",
+    "source": "https://covers.openlibrary.org/b/isbn/9780061122415-M.jpg?default=false",
+    "isbn": "9780061122415",
+    "path": "/images/covers/alchemist.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "martian",
+    "source": "https://covers.openlibrary.org/b/isbn/9780553418026-M.jpg?default=false",
+    "isbn": "9780553418026",
+    "path": "/images/covers/martian.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "project-hail-mary",
+    "source": "https://covers.openlibrary.org/b/isbn/9780593135204-M.jpg?default=false",
+    "isbn": "9780593135204",
+    "path": "/images/covers/project-hail-mary.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "piranesi",
+    "source": "https://covers.openlibrary.org/b/isbn/9781635575637-M.jpg?default=false",
+    "isbn": "9781635575637",
+    "path": "/images/covers/piranesi.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "silent-patient",
+    "source": "https://covers.openlibrary.org/b/isbn/9781250301697-M.jpg?default=false",
+    "isbn": "9781250301697",
+    "path": "/images/covers/silent-patient.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "thursday-murder",
+    "source": "https://covers.openlibrary.org/b/isbn/9781984880987-M.jpg?default=false",
+    "isbn": "9781984880987",
+    "path": "/images/covers/thursday-murder.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "murder-roger",
+    "source": "https://covers.openlibrary.org/b/isbn/9780062073563-M.jpg?default=false",
+    "isbn": "9780062073563",
+    "path": "/images/covers/murder-roger.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "hobbit",
+    "source": "https://covers.openlibrary.org/b/isbn/9780547928227-M.jpg?default=false",
+    "isbn": "9780547928227",
+    "path": "/images/covers/hobbit.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "little-prince",
+    "source": "https://covers.openlibrary.org/b/isbn/9780156012195-M.jpg?default=false",
+    "isbn": "9780156012195",
+    "path": "/images/covers/little-prince.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "ocean-end",
+    "source": "https://covers.openlibrary.org/b/isbn/9780062255655-M.jpg?default=false",
+    "isbn": "9780062255655",
+    "path": "/images/covers/ocean-end.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "norwegian-wood",
+    "source": "https://covers.openlibrary.org/b/isbn/9780375704024-M.jpg?default=false",
+    "isbn": "9780375704024",
+    "path": "/images/covers/norwegian-wood.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "kite-runner",
+    "source": "https://covers.openlibrary.org/b/isbn/9781594631931-M.jpg?default=false",
+    "isbn": "9781594631931",
+    "path": "/images/covers/kite-runner.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "sapiens",
+    "source": "https://covers.openlibrary.org/b/isbn/9780062316097-M.jpg?default=false",
+    "isbn": "9780062316097",
+    "path": "/images/covers/sapiens.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "brief-history-time",
+    "source": "https://covers.openlibrary.org/b/isbn/9780553380163-M.jpg?default=false",
+    "isbn": "9780553380163",
+    "path": "/images/covers/brief-history-time.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "psychology-money",
+    "source": "https://covers.openlibrary.org/b/isbn/9780857197689-M.jpg?default=false",
+    "isbn": "9780857197689",
+    "path": "/images/covers/psychology-money.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "deep-work",
+    "source": "https://covers.openlibrary.org/b/isbn/9781455586691-M.jpg?default=false",
+    "isbn": "9781455586691",
+    "path": "/images/covers/deep-work.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "ai-modern",
+    "source": "https://covers.openlibrary.org/b/isbn/9780134610993-M.jpg?default=false",
+    "isbn": "9780134610993",
+    "path": "/images/covers/ai-modern.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "ai-guide",
+    "source": "https://covers.openlibrary.org/b/isbn/9780374257835-M.jpg?default=false",
+    "isbn": "9780374257835",
+    "path": "/images/covers/ai-guide.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "hands-on-ml",
+    "source": "https://covers.openlibrary.org/b/isbn/9781098125974-M.jpg?default=false",
+    "isbn": "9781098125974",
+    "path": "/images/covers/hands-on-ml.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "python-crash",
+    "source": "https://covers.openlibrary.org/b/isbn/9781718502703-M.jpg?default=false",
+    "isbn": "9781718502703",
+    "path": "/images/covers/python-crash.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "grokking-algorithms",
+    "source": "https://covers.openlibrary.org/b/isbn/9781617292231-M.jpg?default=false",
+    "isbn": "9781617292231",
+    "path": "/images/covers/grokking-algorithms.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "design-everyday",
+    "source": "https://covers.openlibrary.org/b/isbn/9780465050659-M.jpg?default=false",
+    "isbn": "9780465050659",
+    "path": "/images/covers/design-everyday.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "creative-act",
+    "source": "https://covers.openlibrary.org/b/isbn/9780593652886-M.jpg?default=false",
+    "isbn": "9780593652886",
+    "path": "/images/covers/creative-act.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "thinking-fast",
+    "source": "https://covers.openlibrary.org/b/isbn/9780374533557-M.jpg?default=false",
+    "isbn": "9780374533557",
+    "path": "/images/covers/thinking-fast.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "man-search",
+    "source": "https://covers.openlibrary.org/b/isbn/9780807014295-M.jpg?default=false",
+    "isbn": "9780807014295",
+    "path": "/images/covers/man-search.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "ikigai",
+    "source": "https://covers.openlibrary.org/b/isbn/9780143130727-M.jpg?default=false",
+    "isbn": "9780143130727",
+    "path": "/images/covers/ikigai.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "1984",
+    "source": "https://covers.openlibrary.org/b/isbn/9780451524935-M.jpg?default=false",
+    "isbn": "9780451524935",
+    "path": "/images/covers/1984.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "animal-farm",
+    "source": "https://covers.openlibrary.org/b/isbn/9780451526342-M.jpg?default=false",
+    "isbn": "9780451526342",
+    "path": "/images/covers/animal-farm.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "dune",
+    "source": "https://covers.openlibrary.org/b/isbn/9780441172719-M.jpg?default=false",
+    "isbn": "9780441172719",
+    "path": "/images/covers/dune.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "station-eleven",
+    "source": "https://covers.openlibrary.org/b/isbn/9780804172448-M.jpg?default=false",
+    "isbn": "9780804172448",
+    "path": "/images/covers/station-eleven.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "before-coffee",
+    "source": "https://covers.openlibrary.org/b/isbn/9781335430991-M.jpg?default=false",
+    "isbn": "9781335430991",
+    "path": "/images/covers/before-coffee.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "book-thief",
+    "source": "https://covers.openlibrary.org/b/isbn/9780375842207-M.jpg?default=false",
+    "isbn": "9780375842207",
+    "path": "/images/covers/book-thief.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "pride-prejudice",
+    "source": "https://covers.openlibrary.org/b/isbn/9780141439518-M.jpg?default=false",
+    "isbn": "9780141439518",
+    "path": "/images/covers/pride-prejudice.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "a-room",
+    "source": "https://covers.openlibrary.org/b/isbn/9780156787338-M.jpg?default=false",
+    "isbn": "9780156787338",
+    "path": "/images/covers/a-room.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "zero-one",
+    "source": "https://covers.openlibrary.org/b/isbn/9780804139298-M.jpg?default=false",
+    "isbn": "9780804139298",
+    "path": "/images/covers/zero-one.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "algorithms-live",
+    "source": "https://covers.openlibrary.org/b/isbn/9781627790369-M.jpg?default=false",
+    "isbn": "9781627790369",
+    "path": "/images/covers/algorithms-live.jpg",
+    "type": "book artwork, source-linked; not a blanket public-domain claim"
+  },
+  {
+    "id": "library-tables",
+    "source": "https://images.unsplash.com/photo-1572499234610-4b7fd450e8bc?w=1000&q=85&fit=crop",
+    "license": "https://unsplash.com/license",
+    "type": "editorial photography; verify source rights before publication"
+  },
+  {
+    "id": "library-study",
+    "source": "https://images.unsplash.com/photo-1548453282-29d422a7025a?w=1000&q=85&fit=crop",
+    "license": "https://unsplash.com/license",
+    "type": "editorial photography; verify source rights before publication"
+  }
+]
