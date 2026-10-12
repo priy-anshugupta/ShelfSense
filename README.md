@@ -248,6 +248,9 @@ No Google Books, image-generation, or Hugging Face key is needed for the bundled
 
 ## Neon PostgreSQL
 
+For connection setup, persistence checks, troubleshooting, and rollback, use the
+[dedicated Neon guide](docs/NEON-SETUP.md).
+
 The backend accepts a standard PostgreSQL URL and switches to the psycopg SQLAlchemy dialect automatically. Neon supplies the database; FastAPI still runs separately.
 
 1. Create a dedicated project in [Neon Console](https://console.neon.tech/).
