@@ -1,0 +1,98 @@
+export type Copy = {
+  id: string;
+  edition_id: string;
+  branch: string;
+  location: string;
+  status: string;
+  observed_status?: string;
+  updated_at: string;
+  language: string;
+  pages: number | null;
+};
+export type Book = {
+  id: string;
+  title: string;
+  author: string;
+  isbn: string;
+  pages: number;
+  year: number;
+  genre: string;
+  mood: string;
+  pace: string;
+  level: string;
+  color: string;
+  description: string;
+  tags: string[];
+  language: string;
+  featured: boolean;
+  available: number;
+  availability: string;
+  copies: Copy[];
+  editions: { id: string; isbn: string; pages: number; language: string }[];
+  reasons?: string[];
+  tradeoff?: string;
+  factors?: Record<string, number>;
+  evidence?: { field: string; value: string; source: string }[];
+  source: string;
+  evidence_label: string;
+};
+export type Constraints = {
+  genre?: string;
+  mood?: string;
+  level?: string;
+  mode?: string;
+  language?: string;
+  branch?: string;
+  max_pages?: number | null;
+  available_only?: boolean;
+  exclude_romance?: boolean;
+};
+export type Entry = {
+  book: Book;
+  status: string;
+  rating: number | null;
+  progress: number;
+  note: string;
+};
+export type Session = {
+  id: string;
+  version: number;
+  query: string;
+  constraints: Constraints;
+  pins: string[];
+  exclude: string[];
+  messages: { role: string; text: string }[];
+  books: Book[];
+  engine?: string;
+  provider?: string;
+  history?: unknown[];
+  agent_trace?: AgentEvent[];
+  learning_steps?: { work_id: string; title: string; prerequisite: string }[];
+  tools_used?: string[];
+  intent?: string;
+};
+export type AgentEvent = {
+  event?: string;
+  agent: string;
+  state: string;
+  summary: string;
+  mode?: string;
+  name?: string;
+};
+export type Account = {
+  id: string;
+  email: string;
+  name: string;
+  provider: string;
+};
+export type Config = {
+  demo: boolean;
+  openai: boolean;
+  agent_roles: { id: string; name: string; role: string }[];
+  semantic: boolean;
+  auth: boolean;
+  auth_provider: string;
+  staff: boolean;
+  storage: string;
+  owner_type: string;
+};
