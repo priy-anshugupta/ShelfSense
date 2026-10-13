@@ -301,7 +301,7 @@ npm.cmd run typecheck
 npm.cmd run build
 ```
 
-**Verified release:** 24 backend tests, TypeScript checking, production build, HTTP gateway checks, and desktop browser flows. Coverage includes account recovery/session revocation, ownership, guest claiming, staff permissions, edition constraints, stale availability, import validation, revisions/undo, catalog evidence, and mocked agent tool boundaries.
+**Verified release:** 27 backend tests, TypeScript checking, production build, HTTP gateway checks, and desktop browser flows. Coverage includes account recovery/session revocation, ownership, guest claiming, staff permissions, edition constraints, stale availability, import validation, revisions/undo, catalog evidence, and mocked agent tool boundaries.
 
 Desktop checks cover signup, onboarding, sign-in/out, shelf persistence, reading dashboard updates, streamed local recommendations, and staff screens. Live OpenAI, optional Supabase, and hosted PostgreSQL remain credential-dependent. Read the [verification record](docs/VERIFICATION.md) for the exact scope.
 

@@ -40,8 +40,21 @@ def semantic_model():
 def semantic_index(documents):
     return semantic_model().encode(list(documents), normalize_embeddings=True)
 
-def inventory(db, work_id, branch='', language='', max_pages=None):
-    editions = db.query(Edition).filter_by(work_id=work_id).all()
+def load_inventory(db, work_ids):
+    """Fetch a request's editions and copies in two queries, without stale caching."""
+    ids=list(set(work_ids))
+    editions_by_work={id:[] for id in ids}
+    copies_by_edition={}
+    if ids:
+        for edition in db.query(Edition).filter(Edition.work_id.in_(ids)).all():
+            editions_by_work[edition.work_id].append(edition)
+        for copy in db.query(Copy).join(Edition,Copy.edition_id==Edition.id).filter(Edition.work_id.in_(ids)).all():
+            copies_by_edition.setdefault(copy.edition_id,[]).append(copy)
+    return editions_by_work,copies_by_edition
+
+def inventory(db, work_id, branch='', language='', max_pages=None, snapshot=None):
+    snapshot=snapshot if snapshot is not None else load_inventory(db,[work_id])
+    editions = snapshot[0].get(work_id,[])
     threshold = float(os.getenv('INVENTORY_FRESHNESS_HOURS', '24'))
     result = []
     for e in editions:
@@ -49,7 +62,7 @@ def inventory(db, work_id, branch='', language='', max_pages=None):
             continue
         if max_pages is not None and (e.pages is None or e.pages > max_pages):
             continue
-        for c in db.query(Copy).filter_by(edition_id=e.id).all():
+        for c in snapshot[1].get(e.id,[]):
             if branch and c.branch != branch:
                 continue
             observed = c.updated_at.replace(tzinfo=timezone.utc) if c.updated_at.tzinfo is None else c.updated_at
@@ -57,10 +70,11 @@ def inventory(db, work_id, branch='', language='', max_pages=None):
             result.append(dict(id=c.id, edition_id=e.id, language=e.language, pages=e.pages, isbn=e.isbn, branch=c.branch, location=c.location, status=c.status if fresh else 'stale', observed_status=c.status, updated_at=observed.isoformat()))
     return result
 
-def view_book(db, b, constraints=None):
+def view_book(db, b, constraints=None, snapshot=None):
     constraints = constraints or {}
-    copies = inventory(db, b['id'], constraints.get('branch',''), constraints.get('language',''), constraints.get('max_pages'))
-    editions = [dict(id=e.id, isbn=e.isbn, pages=e.pages, language=e.language) for e in db.query(Edition).filter_by(work_id=b['id']).all()]
+    snapshot=snapshot if snapshot is not None else load_inventory(db,[b['id']])
+    copies = inventory(db, b['id'], constraints.get('branch',''), constraints.get('language',''), constraints.get('max_pages'),snapshot)
+    editions = [dict(id=e.id, isbn=e.isbn, pages=e.pages, language=e.language) for e in snapshot[0].get(b['id'],[])]
     return {**b, 'copies': copies, 'editions': editions, 'available': sum(c['status']=='available' for c in copies), 'availability': 'available' if any(c['status']=='available' for c in copies) else 'checked_out' if any(c['status']=='checked_out' for c in copies) else 'unknown'}
 
 def rank(db, query='', constraints=None, owner='', exclude=None, route='familiar', limit=12, pins=None):
@@ -70,6 +84,8 @@ def rank(db, query='', constraints=None, owner='', exclude=None, route='familiar
     books = [x.data for x in db.query(Book).order_by(Book.id).all()]
     if not books:
         return [], 'lexical'
+    snapshot=load_inventory(db,[b['id'] for b in books])
+    books_by_id={b['id']:b for b in books}
     docs = tuple(document(b) for b in books)
     vectorizer, matrix = lexical_index(docs)
     effective_query = normalize(query + ' ' + ' '.join(pins))
@@ -87,7 +103,7 @@ def rank(db, query='', constraints=None, owner='', exclude=None, route='familiar
     profile = db.get(Preference, owner)
     interests = profile.data.get('interests', []) if profile else []
     feedback = db.query(Feedback).filter_by(owner=owner).all() if owner else []
-    negative_genres = {db.get(Book,f.work_id).data['genre'] for f in feedback if f.reason == 'not_for_me' and db.get(Book,f.work_id)}
+    negative_genres = {books_by_id[f.work_id]['genre'] for f in feedback if f.reason == 'not_for_me' and f.work_id in books_by_id}
     read = {s.work_id for s in db.query(Shelf).filter_by(owner=owner, status='finished').all()} if owner else set()
     banned_tags = set(profile.data.get('exclusions', [])) if profile else set()
     candidates = []
@@ -105,7 +121,7 @@ def rank(db, query='', constraints=None, owner='', exclude=None, route='familiar
             continue
         if constraints.get('mode') == 'fiction' and b['genre'] not in ['Fiction','Science fiction','Fantasy','Mystery']:
             continue
-        item = view_book(db,b,constraints)
+        item = view_book(db,b,constraints,snapshot)
         if (constraints.get('max_pages') is not None or constraints.get('language')) and not any((not constraints.get('language') or e['language']==constraints['language']) and (constraints.get('max_pages') is None or e['pages'] is not None and e['pages']<=constraints['max_pages']) for e in item['editions']):
             continue
         if constraints.get('available_only') and not item['available']:

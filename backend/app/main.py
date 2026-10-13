@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field, ConfigDict, ValidationError
 from sqlalchemy.orm import Session
 from sqlalchemy import update
 from .database import initialize, get_db, Book, Edition, Copy, Shelf, Preference, Chat, Feedback, ImportRun, Audit, Account, now
-from .recommendations import rank, view_book, extract_rules
+from .recommendations import rank, view_book, extract_rules, load_inventory
 from .schemas import Constraints
 from .auth import router as auth_router, session_account
 from .agents import run_agents, ROLES, configured
@@ -196,7 +196,13 @@ def recommend(payload:RecommendationInput,owner=Depends(identity),db:Session=Dep
 
 @app.get('/api/v1/me/shelf')
 def shelf(owner=Depends(identity),db:Session=Depends(get_db)):
-    return {'entries':[{'book':view_book(db,book_or_404(db,s.work_id).data),'status':s.status,'rating':s.rating,'progress':s.progress,'note':s.note} for s in db.query(Shelf).filter_by(owner=owner).all()]}
+    entries=db.query(Shelf).filter_by(owner=owner).all()
+    if not entries:
+        return {'entries':[]}
+    ids=[s.work_id for s in entries]
+    works={b.id:b.data for b in db.query(Book).filter(Book.id.in_(ids)).all()}
+    snapshot=load_inventory(db,ids)
+    return {'entries':[{'book':view_book(db,works[s.work_id],snapshot=snapshot),'status':s.status,'rating':s.rating,'progress':s.progress,'note':s.note} for s in entries]}
 
 @app.put('/api/v1/me/shelf/{work_id}')
 def save_shelf(work_id:str,payload:ShelfInput,owner=Depends(identity),db:Session=Depends(get_db)):
@@ -343,7 +349,9 @@ def undo(id:str,owner=Depends(identity),db:Session=Depends(get_db)):
 
 @app.get('/api/v1/admin/overview')
 def overview(owner=Depends(staff),db:Session=Depends(get_db)):
-    books=[view_book(db,b.data) for b in db.query(Book).all()]
+    works=db.query(Book).all()
+    snapshot=load_inventory(db,[b.id for b in works])
+    books=[view_book(db,b.data,snapshot=snapshot) for b in works]
     genre_counts=defaultdict(int)
     for b in books:
         genre_counts[b['genre']]+=1

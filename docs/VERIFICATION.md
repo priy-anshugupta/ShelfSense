@@ -1,3 +1,16 @@
+# Neon query optimization - 13 October 2026
+
+- Before: a direct catalog request for 12 results took 45.34 seconds against Neon. Ranking hydrated the full 40-work catalog through per-work edition/copy queries.
+- After: catalog requests through the website gateway took 4.62 and 4.79 seconds; the library overview took 4.12 seconds. These are individual local-to-Neon observations, not latency guarantees or a controlled statistical benchmark.
+- Edition and copy retrieval now uses two bulk queries per collection operation. Ranking uses six SELECT statements regardless of the number of books/editions; shelf retrieval uses four, and staff overview uses seven.
+- No cross-request inventory cache is introduced. Language/page/branch eligibility and freshness are recalculated from each request's records.
+- 27 backend tests pass, including query-budget checks on 60 books with multiple editions, immediate visibility of inventory changes, and fixed shelf/overview query counts.
+- Desktop browser verification: Discover renders all 40 catalog works after the restarted backend loads the optimized code.
+
+Earlier verification records below describe the state at their recorded dates.
+
+---
+
 # Upgrade verification - 10 October 2026
 
 - 24 backend tests pass, including seven new account/agent tests: salted password hashing, hashed sessions, local account identity, guest shelf claiming, recovery-code rotation, session revocation, duplicate signup, local staff authorization, real mocked Responses tool execution, unretrieved-ID fallback, learning order preservation, and honest missing-key activity.
