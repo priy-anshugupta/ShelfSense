@@ -52,6 +52,22 @@ export function Loading() {
     </div>
   );
 }
+export function BookGridLoading({ count = 8 }: { count?: number }) {
+  return (
+    <div role="status" aria-label="Loading books">
+      <span className="sr-only">Loading books…</span>
+      <div className={"book-grid " + (count === 5 ? "five" : "")}>
+        {Array.from({ length: count }, (_, i) => (
+          <div key={i} className="book-skeleton" aria-hidden="true">
+            <div className="skeleton-cover" />
+            <div className="skeleton-line" />
+            <div className="skeleton-line short" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 export function Empty({
   title,
   text,

@@ -31,4 +31,10 @@ Chat writes use database compare-and-set revisions. Undo increases the version. 
 
 ## Verification boundaries
 
-Local accounts and mocked OpenAI orchestration are tested. Live OpenAI and optional Supabase/PostgreSQL need user credentials for end-to-end verification. The 40-title catalog and fictional inventory remain a student-project demonstration. Real-library adapters, reservations, inferred prerequisite graphs, durable vector indexes, broad multilingual evaluation, and public deployment are extensions.
+Local accounts and mocked OpenAI orchestration are tested. Live OpenAI and optional Supabase/PostgreSQL need user credentials for end-to-end verification. The 54-title catalog and fictional inventory remain a student-project demonstration. Real-library adapters, reservations, inferred prerequisite graphs, durable vector indexes, broad multilingual evaluation, and public deployment are extensions.
+
+## Loading and academic expansion
+
+Shared work/edition metadata has a 120-second in-process TTL, configurable through CATALOG_CACHE_SECONDS, and is invalidated after application metadata commits. It is partitioned by database engine. Copies and per-reader preferences/feedback/finished books are fetched live; availability freshness is recalculated each request. External SQL edits and other server processes can take up to the TTL to reach this process. Reader context uses one scoped UNION query. Warm catalog requests use two SELECTs; simultaneous identical browser reads are deduplicated without storing completed private responses. Account/copy updates are never shared through a public response cache.
+
+Startup adds missing seed titles in batches while preserving staff edits and reader data. The 14 academic additions have source-linked metadata, subject filters, 12 cached cover images, and two labeled typographic fallbacks. Academic prerequisites remain project-curated. Engineering foundations is the fourth curated learning path.

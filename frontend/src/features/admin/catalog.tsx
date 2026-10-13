@@ -224,6 +224,8 @@ export default function CatalogAdmin() {
                     "History",
                     "Personal growth",
                     "Memoir",
+                    "Engineering",
+                    "Mathematics",
                   ].map((g) => (
                     <option key={g}>{g}</option>
                   ))}

@@ -2,6 +2,7 @@ from sqlalchemy import event
 from test_core import client
 from app.database import Book, Copy, Edition, now
 from app.recommendations import rank
+from app.catalog import seed_books
 
 def measure_queries(sessions):
     statements=[]
@@ -30,8 +31,12 @@ def test_catalog_query_count_does_not_grow_with_works_or_editions(client):
     try:
         with sessions() as db:
             books,_=rank(db,'',{},'guest:budget',limit=100)
-        assert len(books)==60
-        assert len(statements)==6  # works, editions, copies, preferences, feedback, finished shelf
+        assert len(books)==len(seed_books())+20
+        assert len(statements)==4  # cold metadata, live copies, combined reader context
+        statements.clear()
+        with sessions() as db:
+            rank(db,'',{},'guest:budget',limit=100)
+        assert len(statements)==2  # warm metadata; copies and reader data remain live
     finally:
         event.remove(engine,'before_cursor_execute',record)
 
@@ -51,9 +56,12 @@ def test_overview_and_shelf_use_fixed_query_budgets(client):
     event.listen(engine,'before_cursor_execute',record)
     try:
         assert len(c.get('/api/v1/me/shelf').json()['entries'])==3
-        assert len(statements)==4  # shelf, works, editions, copies
+        assert len(statements)==4  # shelf, cold metadata, live copies
+        statements.clear()
+        assert len(c.get('/api/v1/me/shelf').json()['entries'])==3
+        assert len(statements)==2  # shelf and live copies with warm metadata
         statements.clear()
         assert c.get('/api/v1/admin/overview').status_code==200
-        assert len(statements)==7
+        assert len(statements)==4
     finally:
         event.remove(engine,'before_cursor_execute',record)

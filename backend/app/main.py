@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import update
 from .database import initialize, get_db, Book, Edition, Copy, Shelf, Preference, Chat, Feedback, ImportRun, Audit, Account, now
 from .recommendations import rank, view_book, extract_rules, load_inventory
+from .catalog_cache import catalog_metadata
 from .schemas import Constraints
 from .auth import router as auth_router, session_account
 from .agents import run_agents, ROLES, configured
@@ -33,7 +34,8 @@ async def lifespan(app):
         from .recommendations import semantic_index, document
         from .database import SessionLocal
         with SessionLocal() as db:
-            documents=tuple(document(b.data) for b in db.query(Book).order_by(Book.id).all())
+            works,_=catalog_metadata(db)
+            documents=tuple(document(b) for b in works)
         try:
             await asyncio.to_thread(semantic_index, documents)
         except Exception:
@@ -74,10 +76,14 @@ async def identity(request: Request):
             raise HTTPException(503,'The identity service is unavailable.')
     if request.headers.get('x-local-session'):
         from .database import SessionLocal
-        with SessionLocal() as auth_db:
-            account=session_account(auth_db,request)
-        if account:
-            return 'local:'+account.id
+        def local_account_id():
+            with SessionLocal() as auth_db:
+                account=session_account(auth_db,request)
+                return account.id if account else None
+        # Remote SQL must not block the ASGI event loop for every signed-in call.
+        account_id=await asyncio.to_thread(local_account_id)
+        if account_id:
+            return 'local:'+account_id
         raise HTTPException(401,'Your session expired. Please sign in again.')
     device=request.headers.get('x-device-id','')
     try:
@@ -134,7 +140,7 @@ class CatalogInput(BaseModel):
     title: str=Field(min_length=1,max_length=250)
     author: str=Field(min_length=1,max_length=200)
     description: str=Field(min_length=10,max_length=3000)
-    genre: Literal['Fiction','Fantasy','Science fiction','Mystery','Technology','Science','Design','Psychology','History','Personal growth','Memoir']
+    genre: Literal['Fiction','Fantasy','Science fiction','Mystery','Technology','Science','Design','Psychology','History','Personal growth','Memoir','Engineering','Mathematics']
     mood: str=Field(min_length=1,max_length=40)
     pace: Literal['Slow','Medium','Fast']
     level: Literal['Beginner','Intermediate','Advanced']
@@ -173,14 +179,16 @@ async def config(owner=Depends(identity)):
     return {'demo':DEMO,'openai':configured(),'agent_roles':ROLES,'semantic':bool(os.getenv('EMBEDDING_MODEL')),'auth':True,'auth_provider':'supabase' if os.getenv('SUPABASE_URL') else 'local','staff':DEMO or owner.split(':',1)[1] in os.getenv('STAFF_USER_IDS','').split(','),'storage':'PostgreSQL' if os.getenv('DATABASE_URL','').startswith('postgres') else 'SQLite','owner_type':owner.split(':')[0]}
 
 @app.get('/api/v1/books')
-def books(q:str='',genre:str='',mood:str='',level:str='',mode:str='',language:str='',branch:str='',max_pages:int|None=None,available_only:bool=False,route:str='familiar',limit:int=40,owner=Depends(identity),db:Session=Depends(get_db)):
+def books(q:str='',genre:str='',mood:str='',level:str='',mode:str='',subject:str='',language:str='',branch:str='',max_pages:int|None=None,available_only:bool=False,featured_only:bool=False,route:str='familiar',limit:int=100,owner=Depends(identity),db:Session=Depends(get_db)):
     if len(q)>1500 or limit<1 or limit>100:
         raise HTTPException(422,'Invalid search limits.')
     try:
-        constraints=Constraints(genre=genre,mood=mood,level=level,mode=mode,language=language,branch=branch,max_pages=max_pages,available_only=available_only).model_dump()
+        constraints=Constraints(genre=genre,mood=mood,level=level,mode=mode,subject=subject,language=language,branch=branch,max_pages=max_pages,available_only=available_only).model_dump()
     except ValidationError:
         raise HTTPException(422,'One or more search filters are invalid.')
-    results,engine=rank(db,q,constraints,owner,route=route,limit=limit)
+    results,engine=rank(db,q,constraints,owner,route=route,limit=100 if featured_only else limit)
+    if featured_only:
+        results=[b for b in results if b.get('featured')][:limit]
     return {'books':results,'total':len(results),'engine':engine}
 
 @app.get('/api/v1/books/{work_id}')
@@ -200,8 +208,9 @@ def shelf(owner=Depends(identity),db:Session=Depends(get_db)):
     if not entries:
         return {'entries':[]}
     ids=[s.work_id for s in entries]
-    works={b.id:b.data for b in db.query(Book).filter(Book.id.in_(ids)).all()}
-    snapshot=load_inventory(db,ids)
+    records,editions=catalog_metadata(db)
+    works={b['id']:b for b in records}
+    snapshot=load_inventory(db,ids,editions)
     return {'entries':[{'book':view_book(db,works[s.work_id],snapshot=snapshot),'status':s.status,'rating':s.rating,'progress':s.progress,'note':s.note} for s in entries]}
 
 @app.put('/api/v1/me/shelf/{work_id}')
@@ -349,13 +358,13 @@ def undo(id:str,owner=Depends(identity),db:Session=Depends(get_db)):
 
 @app.get('/api/v1/admin/overview')
 def overview(owner=Depends(staff),db:Session=Depends(get_db)):
-    works=db.query(Book).all()
-    snapshot=load_inventory(db,[b.id for b in works])
-    books=[view_book(db,b.data,snapshot=snapshot) for b in works]
+    works,editions=catalog_metadata(db)
+    snapshot=load_inventory(db,[b['id'] for b in works],editions)
+    books=[view_book(db,b,snapshot=snapshot) for b in works]
     genre_counts=defaultdict(int)
     for b in books:
         genre_counts[b['genre']]+=1
-    copies=db.query(Copy).all()
+    copies=[c for items in snapshot[1].values() for c in items]
     stale=sum(c['status']=='stale' for b in books for c in b['copies'])
     return {'books':books,'works':len(books),'copies':len(copies),'available':sum(b['available'] for b in books),'imports':db.query(ImportRun).count(),'demo':DEMO,'genres':dict(genre_counts),'stale':stale,'accounts':db.query(Account).count(),'recent_activity':[{'action':a.action,'detail':a.detail,'timestamp':a.created_at.isoformat()} for a in db.query(Audit).order_by(Audit.created_at.desc()).limit(6)],'agents':{'configured':configured(),'roles':ROLES}}
 
@@ -491,4 +500,9 @@ def export(owner=Depends(identity),db:Session=Depends(get_db)):
 @app.get('/api/v1/paths')
 def paths(owner=Depends(identity),db:Session=Depends(get_db)):
     definitions=[('ai-foundations','Understand artificial intelligence','Start with ideas, build your programming confidence, then explore practical models.',['ai-guide','python-crash','hands-on-ml'],['No advanced mathematics assumed','Basic computer familiarity; practice Python exercises','Requires Python and introductory mathematics']),('clear-thinking','Think more clearly','Explore behavior, decisions, and practical frameworks.',['psychology-money','thinking-fast','algorithms-live'],['Accessible introduction to behavior','A deeper, slower exploration of cognitive research','Comfort with conceptual computing examples']),('design-foundations','Build a designer’s eye','Learn to notice everyday design, then develop your creative practice.',['design-everyday','creative-act','a-room'],['No prior design study required','Reflective exercises for creative work','Literary reflection; not a technical design manual'])]
-    return {'paths':[{'id':id,'title':title,'description':desc,'steps':[{'book':view_book(db,book_or_404(db,bid).data),'prerequisite':req} for bid,req in zip(ids,requirements)],'source':'Project-curated sequence; not automatically inferred prerequisites'} for id,title,desc,ids,requirements in definitions]}
+    definitions.append(('engineering-foundations','Build your engineering foundations','Move from calculus to university physics and introductory mechanics.',['calculus-volume-one','university-physics','engineering-mechanics'],['Requires algebra and trigonometry','Requires basic calculus; focus on mechanics and waves','Requires introductory physics and calculus']))
+    works,editions=catalog_metadata(db)
+    by_id={b['id']:b for b in works}
+    ids={bid for _,_,_,books,_ in definitions for bid in books}
+    snapshot=load_inventory(db,ids,editions)
+    return {'paths':[{'id':id,'title':title,'description':desc,'steps':[{'book':view_book(db,by_id[bid],snapshot=snapshot),'prerequisite':req} for bid,req in zip(ids,requirements) if bid in by_id],'source':'Project-curated sequence; not automatically inferred prerequisites'} for id,title,desc,ids,requirements in definitions]}

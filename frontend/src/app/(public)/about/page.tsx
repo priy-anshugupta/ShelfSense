@@ -37,7 +37,7 @@ export default function About() {
         <div className="callout">
           <strong>A demonstration, honestly labeled</strong>
           <p>
-            This release includes 40 real titles with project-curated
+            This release includes 54 real titles with project-curated
             descriptions and attributes, and fictional library copies for
             demonstrating the flow. The reading-room image is an original
             AI-generated editorial illustration, not a photo of a real college.

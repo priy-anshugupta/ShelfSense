@@ -47,4 +47,5 @@ def seed_books():
     for index, row in enumerate(CATALOG):
         slug,title,author,isbn,pages,year,genre,mood,pace,level,color,description,tags = row
         result.append(dict(id=slug,title=title,author=author,isbn=isbn,pages=pages,year=year,genre=genre,mood=mood,pace=pace,level=level,color=color,description=description,tags=tags,language="eng",featured=index<5,source="Curated demo catalog",evidence_label="Project-curated attributes; edition metadata should be checked before real-library use"))
-    return result
+    from .academic_catalog import academic_books
+    return result+academic_books()

@@ -115,14 +115,19 @@ def initialize():
             for table in Base.metadata.sorted_tables:
                 connection.execute(text(f'ALTER TABLE "{table.name}" ENABLE ROW LEVEL SECURITY'))
     with SessionLocal() as db:
-        if db.query(Book).count():
+        existing={id for (id,) in db.query(Book.id).all()}
+        additions=[(index,data) for index,data in enumerate(seed_books()) if data['id'] not in existing]
+        if not additions:
             return
-        for index, data in enumerate(seed_books()):
-            db.add(Book(id=data['id'], data=data))
-            db.flush()
+        # Add missing seed works only; retain staff edits and all reader data.
+        db.add_all([Book(id=data['id'],data=data) for _,data in additions])
+        db.flush()
+        for index, data in additions:
             edition_id = data['id'] + '-eng'
             db.add(Edition(id=edition_id, work_id=data['id'], isbn=data['isbn'], pages=data['pages'], language='eng'))
-            db.flush()
+        db.flush()
+        for index, data in additions:
+            edition_id = data['id'] + '-eng'
             for n in range(1 + index % 3):
                 db.add(Copy(id=f'{edition_id}-{n}', edition_id=edition_id, branch='Central Library' if n < 2 else 'Study Annex', location=f'{data["genre"]} · Bay {index % 8 + 1}, Shelf {n + 1}', status='checked_out' if index % 6 == 5 else 'available', updated_at=now()))
         db.commit()

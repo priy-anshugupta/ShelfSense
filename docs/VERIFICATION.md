@@ -1,3 +1,24 @@
+# Academic catalog and loading release - 13 October 2026
+
+- 54 catalog titles now include 14 source-linked academic/engineering additions. Neon contains 54 editions and 108 fictional sample copies. Existing works, staff edits, accounts, and reader records are preserved; missing seed additions are repeat-safe.
+- Shared work/edition metadata uses a configurable 120-second process cache. Staff metadata commits invalidate it; other processes or external SQL edits can remain unseen until TTL expiry. Copies and reader context remain live.
+- Warm catalog queries use two SELECT statements. Cold metadata adds two more. Warm shelves use two SELECTs, and the warm overview uses four. Private reader data is not in the shared cache.
+- 31 backend tests pass, including metadata edit invalidation, reader isolation, live copy changes, academic/subject filtering, featured homepage selection, seed upgrade safety, and prerequisite ordering.
+- Final frontend production build passes with TypeScript checks. Initial book loading uses a stable cover-grid skeleton, images decode asynchronously, simultaneous identical GETs are deduplicated, and the homepage requests only five featured results.
+- Desktop browser checks at 1440 x 1000: the new Academic & engineering tab renders 14 books with cover artwork, subject switching to Electrical Engineering renders three eligible texts. The screenshot is docs/screenshots/academic-discovery.png.
+
+## Observed website gateway latency
+
+- All 54 books: 2.75 seconds (54 results).
+- Repeat catalog: 1.94 seconds (54 results).
+- Engineering filter: 1.77 seconds (3 results).
+- Home picks: 1.79 seconds (5 results).
+- Learning paths: 0.92 seconds (4 results).
+
+These are individual local-to-Neon observations, not guaranteed response times. Earlier measurements below retain their original catalog and implementation context. The original 40-title evaluation has not been rerun on the expanded catalog.
+
+---
+
 # Neon query optimization - 13 October 2026
 
 - Before: a direct catalog request for 12 results took 45.34 seconds against Neon. Ranking hydrated the full 40-work catalog through per-work edition/copy queries.

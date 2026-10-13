@@ -24,6 +24,7 @@ export function Cover({
           alt={`Cover of ${book.title}`}
           onError={() => setBroken(true)}
           loading={large ? "eager" : "lazy"}
+          decoding="async"
         />
       ) : (
         <div className="cover-fallback">

@@ -1352,3 +1352,69 @@
     height: 115px;
   }
 }
+.academic-discovery {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  background: #e9eddf;
+  border: 1px solid #dce4cf;
+  border-radius: 7px;
+  padding: 26px 30px;
+  margin: 0 0 30px;
+}
+.academic-discovery .eyebrow {
+  font-size: 9px;
+  color: #7b8e69;
+}
+.academic-discovery h2 {
+  font-size: 30px;
+  margin: 12px 0;
+}
+.academic-discovery p {
+  font-size: 12px;
+  color: var(--muted);
+  max-width: 630px;
+  line-height: 1.8;
+}
+.academic-discovery label {
+  min-width: 225px;
+  font-size: 11px;
+}
+.academic-discovery select {
+  width: 100%;
+  margin-top: 9px;
+  background: var(--paper);
+  font-size: 12px;
+}
+.book-skeleton {
+  padding-bottom: 22px;
+}
+.skeleton-cover {
+  aspect-ratio: 3/4;
+  background: #e7eadf;
+  border-radius: 4px;
+  margin-bottom: 19px;
+  animation: skeleton-breathe 1.6s ease-in-out infinite;
+}
+.skeleton-line {
+  height: 12px;
+  width: 84%;
+  background: #e4e8dc;
+  border-radius: 3px;
+  margin: 12px 0;
+}
+.skeleton-line.short {
+  width: 55%;
+  height: 9px;
+}
+@keyframes skeleton-breathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-cover {
+    animation: none;
+  }
+}

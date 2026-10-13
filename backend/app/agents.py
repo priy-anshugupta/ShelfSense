@@ -27,6 +27,14 @@ LEARNING_EVIDENCE={
     'grokking-algorithms':'Beginner introduction; basic programming familiarity is useful.',
     'design-everyday':'No prior design study required.',
     'creative-act':'Reflective creative practice rather than a technical prerequisite course.',
+    'calculus-volume-one':'Start after algebra and trigonometry; build limits and differentiation foundations.',
+    'university-physics':'Requires basic calculus; study mechanics and waves before engineering applications.',
+    'engineering-mechanics':'Requires introductory physics and calculus; focuses on statics and dynamics.',
+    'electric-circuits':'Requires algebra, basic calculus and introductory electricity.',
+    'microelectronic-circuits':'Study introductory electric circuit analysis first.',
+    'engineering-thermodynamics':'Requires introductory physics and engineering mathematics.',
+    'discrete-mathematics':'Requires algebra; develop logic and proofs before advanced algorithm analysis.',
+    'introduction-algorithms':'Requires programming, data structures, and discrete mathematics.',
 }
 
 class Plan(BaseModel):

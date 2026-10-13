@@ -12,6 +12,8 @@ export async function authHeaders(): Promise<Record<string, string>> {
     : null;
   return session ? { Authorization: `Bearer ${session.access_token}` } : {};
 }
+const inFlightReads = new Map<string, Promise<unknown>>();
+let identityRevision = 0;
 export async function api<T>(
   path: string,
   options: RequestInit = {},
@@ -22,21 +24,46 @@ export async function api<T>(
     headers.set("Content-Type", "application/json");
   for (const [key, value] of Object.entries(await authHeaders()))
     headers.set(key, value);
-  const response = await fetch(`/api/${path}`, {
-    ...options,
-    headers,
-    cache: "no-store",
-    signal: options.signal || AbortSignal.timeout(85000),
-  });
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(
-      typeof error.detail === "string"
-        ? error.detail
-        : "The request could not be completed. Check your input and try again.",
-    );
+  const method = (options.method || "GET").toUpperCase();
+  if (method !== "GET") {
+    identityRevision++;
+    inFlightReads.clear();
   }
-  return response.json();
+  const key = JSON.stringify([
+    path,
+    identityRevision,
+    Array.from(headers.entries()),
+  ]);
+  const deduplicate = method === "GET" && !options.signal;
+  if (deduplicate && inFlightReads.has(key))
+    return inFlightReads.get(key) as Promise<T>;
+  const request = (async () => {
+    const response = await fetch(`/api/${path}`, {
+      ...options,
+      headers,
+      cache: "no-store",
+      signal: options.signal || AbortSignal.timeout(85000),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(
+        typeof error.detail === "string"
+          ? error.detail
+          : "The request could not be completed. Check your input and try again.",
+      );
+    }
+    if (method !== "GET") {
+      identityRevision++;
+      inFlightReads.clear();
+    }
+    return response.json();
+  })();
+  if (deduplicate) inFlightReads.set(key, request);
+  try {
+    return await request;
+  } finally {
+    if (inFlightReads.get(key) === request) inFlightReads.delete(key);
+  }
 }
 
 let deviceReady: Promise<void> | null = null;

@@ -290,5 +290,89 @@
     "source": "https://images.unsplash.com/photo-1548453282-29d422a7025a?w=1000&q=85&fit=crop",
     "license": "https://unsplash.com/license",
     "type": "editorial photography; verify source rights before publication"
+  },
+  {
+    "id": "introduction-algorithms",
+    "source": "https://covers.openlibrary.org/b/isbn/9780262046305-M.jpg?default=false",
+    "isbn": "9780262046305",
+    "path": "/images/covers/introduction-algorithms.jpg",
+    "type": "Source-linked academic book cover; third-party artwork"
+  },
+  {
+    "id": "data-intensive-applications",
+    "source": "https://covers.openlibrary.org/b/isbn/9781449373320-M.jpg?default=false",
+    "isbn": "9781449373320",
+    "path": "/images/covers/data-intensive-applications.jpg",
+    "type": "Source-linked academic book cover; third-party artwork"
+  },
+  {
+    "id": "clean-code",
+    "source": "https://covers.openlibrary.org/b/isbn/9780132350884-M.jpg?default=false",
+    "isbn": "9780132350884",
+    "path": "/images/covers/clean-code.jpg",
+    "type": "Source-linked academic book cover; third-party artwork"
+  },
+  {
+    "id": "discrete-mathematics",
+    "source": "https://covers.openlibrary.org/b/isbn/9781259676512-M.jpg?default=false",
+    "isbn": "9781259676512",
+    "path": "/images/covers/discrete-mathematics.jpg",
+    "type": "Source-linked academic book cover; third-party artwork"
+  },
+  {
+    "id": "electric-circuits",
+    "source": "https://covers.openlibrary.org/b/isbn/9780078028229-M.jpg?default=false",
+    "isbn": "9780078028229",
+    "path": "/images/covers/electric-circuits.jpg",
+    "type": "Source-linked academic book cover; third-party artwork"
+  },
+  {
+    "id": "engineering-thermodynamics",
+    "source": "https://covers.openlibrary.org/b/isbn/9780073398174-M.jpg?default=false",
+    "isbn": "9780073398174",
+    "path": "/images/covers/engineering-thermodynamics.jpg",
+    "type": "Source-linked academic book cover; third-party artwork"
+  },
+  {
+    "id": "engineering-mechanics",
+    "source": "https://covers.openlibrary.org/b/isbn/9780133915426-M.jpg?default=false",
+    "isbn": "9780133915426",
+    "path": "/images/covers/engineering-mechanics.jpg",
+    "type": "Source-linked academic book cover; third-party artwork"
+  },
+  {
+    "id": "microelectronic-circuits",
+    "source": "https://covers.openlibrary.org/b/isbn/9780199339136-M.jpg?default=false",
+    "isbn": "9780199339136",
+    "path": "/images/covers/microelectronic-circuits.jpg",
+    "type": "Source-linked academic book cover; third-party artwork"
+  },
+  {
+    "id": "signals-systems",
+    "source": "https://covers.openlibrary.org/b/isbn/9780138147570-M.jpg?default=false",
+    "isbn": "9780138147570",
+    "path": "/images/covers/signals-systems.jpg",
+    "type": "Source-linked academic book cover; third-party artwork"
+  },
+  {
+    "id": "computer-organization",
+    "source": "https://covers.openlibrary.org/b/isbn/9780128201091-M.jpg?default=false",
+    "isbn": "9780128201091",
+    "path": "/images/covers/computer-organization.jpg",
+    "type": "Source-linked academic book cover; third-party artwork"
+  },
+  {
+    "id": "university-physics",
+    "source": "https://covers.openlibrary.org/b/isbn/9781938168277-M.jpg?default=false",
+    "isbn": "9781938168277",
+    "path": "/images/covers/university-physics.jpg",
+    "type": "Source-linked academic book cover; third-party artwork"
+  },
+  {
+    "id": "calculus-volume-one",
+    "source": "https://covers.openlibrary.org/b/isbn/9781938168024-M.jpg?default=false",
+    "isbn": "9781938168024",
+    "path": "/images/covers/calculus-volume-one.jpg",
+    "type": "Source-linked academic book cover; third-party artwork"
   }
 ]

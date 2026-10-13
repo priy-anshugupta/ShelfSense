@@ -17,6 +17,8 @@ export type Book = {
   pages: number;
   year: number;
   genre: string;
+  subject?: string;
+  source_url?: string;
   mood: string;
   pace: string;
   level: string;
@@ -41,6 +43,7 @@ export type Constraints = {
   mood?: string;
   level?: string;
   mode?: string;
+  subject?: string;
   language?: string;
   branch?: string;
   max_pages?: number | null;

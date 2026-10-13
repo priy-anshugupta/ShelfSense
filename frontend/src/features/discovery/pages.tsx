@@ -17,8 +17,8 @@ import {
 import { useData } from "@/lib/use-data";
 import type { Book } from "@/lib/types";
 import { BookCard } from "@/components/book-card";
-import { Loading, Empty, Modal } from "@/components/ui";
-import {useApp} from '@/components/provider';
+import { Loading, BookGridLoading, Empty, Modal } from "@/components/ui";
+import { useApp } from "@/components/provider";
 
 const moods = [
   ["A little escape", "Fantasy"],
@@ -52,8 +52,10 @@ function SearchBox({ large = false }: { large?: boolean }) {
   );
 }
 export function HomePage() {
-  const {account}=useApp();
-  const { data, error, loading } = useData<{ books: Book[] }>("books?limit=40");
+  const { account } = useApp();
+  const { data, error, loading } = useData<{ books: Book[] }>(
+    "books?limit=5&featured_only=true",
+  );
   const featured = [
     "midnight-library",
     "beautiful-world",
@@ -72,15 +74,25 @@ export function HomePage() {
           </div>
           <h1>
             A good book.
-            <br />
-            A whole new <em>world.</em>
+            <br />A whole new <em>world.</em>
           </h1>
           <p className="hero-description">
             For the books you didn’t know you were looking for.
             <br className="desktop" /> A personal librarian, a thoughtful match,
             your next great read.
           </p>
-          <div className="hero-cta-row"><Link className="button primary" href="/discover">Explore the library <ArrowUpRight size={16}/></Link><Link className="hero-secondary-link" href={account?'/dashboard':'/signup'}>{account?'Your reading room':'Create your reading space'} <ArrowRight size={15}/></Link></div>
+          <div className="hero-cta-row">
+            <Link className="button primary" href="/discover">
+              Explore the library <ArrowUpRight size={16} />
+            </Link>
+            <Link
+              className="hero-secondary-link"
+              href={account ? "/dashboard" : "/signup"}
+            >
+              {account ? "Your reading room" : "Create your reading space"}{" "}
+              <ArrowRight size={15} />
+            </Link>
+          </div>
           <SearchBox large />
           <div className="hero-prompts">
             <span>Try a little inspiration</span>
@@ -172,7 +184,7 @@ export function HomePage() {
         {error ? (
           <Empty title="The library is taking a moment" text={error} />
         ) : loading ? (
-          <Loading />
+          <BookGridLoading count={5} />
         ) : (
           <div className="book-grid five">
             {featured.map((b) => (
@@ -181,7 +193,79 @@ export function HomePage() {
           </div>
         )}
       </section>
-      <section className="curated-collections wrap"><div className="section-heading"><div><span className="eyebrow">A DIFFERENT DOOR INTO THE LIBRARY</span><h2>Where will your curiosity take you?</h2></div><Link className="text-link" href="/paths">Follow a learning path <ArrowUpRight size={15}/></Link></div><div className="collection-grid"><Link href="/search?genre=Fantasy" className="collection-tile fiction"><span className="collection-number">01 / STORIES</span><h3>A little escape.<br/><em>A lot of possibility.</em></h3><p>Step into another world.</p><div className="collection-covers"><img src="/images/covers/piranesi.jpg" alt="Piranesi cover"/><img src="/images/covers/hobbit.jpg" alt="The Hobbit cover"/></div><ArrowUpRight size={24}/></Link><Link href="/search?mode=learning" className="collection-tile learning"><span className="collection-number">02 / IDEAS</span><h3>Make room<br/>for <em>a new idea.</em></h3><p>Books that open up a subject.</p><div className="collection-covers"><img src="/images/covers/design-everyday.jpg" alt="The Design of Everyday Things cover"/><img src="/images/covers/ai-guide.jpg" alt="Artificial Intelligence guide cover"/></div><ArrowUpRight size={24}/></Link><Link href="/search?max_pages=250" className="collection-tile short"><span className="collection-number">03 / SMALL WONDERS</span><h3>A few pages.<br/><em>A lasting impression.</em></h3><p>Find a good read under 250 pages.</p><div className="collection-covers"><img src="/images/covers/little-prince.jpg" alt="The Little Prince cover"/><img src="/images/covers/animal-farm.jpg" alt="Animal Farm cover"/></div><ArrowUpRight size={24}/></Link></div></section>
+      <section className="curated-collections wrap">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">A DIFFERENT DOOR INTO THE LIBRARY</span>
+            <h2>Where will your curiosity take you?</h2>
+          </div>
+          <Link className="text-link" href="/paths">
+            Follow a learning path <ArrowUpRight size={15} />
+          </Link>
+        </div>
+        <div className="collection-grid">
+          <Link
+            href="/search?genre=Fantasy"
+            className="collection-tile fiction"
+          >
+            <span className="collection-number">01 / STORIES</span>
+            <h3>
+              A little escape.
+              <br />
+              <em>A lot of possibility.</em>
+            </h3>
+            <p>Step into another world.</p>
+            <div className="collection-covers">
+              <img src="/images/covers/piranesi.jpg" alt="Piranesi cover" />
+              <img src="/images/covers/hobbit.jpg" alt="The Hobbit cover" />
+            </div>
+            <ArrowUpRight size={24} />
+          </Link>
+          <Link
+            href="/search?mode=learning"
+            className="collection-tile learning"
+          >
+            <span className="collection-number">02 / IDEAS</span>
+            <h3>
+              Make room
+              <br />
+              for <em>a new idea.</em>
+            </h3>
+            <p>Books that open up a subject.</p>
+            <div className="collection-covers">
+              <img
+                src="/images/covers/design-everyday.jpg"
+                alt="The Design of Everyday Things cover"
+              />
+              <img
+                src="/images/covers/ai-guide.jpg"
+                alt="Artificial Intelligence guide cover"
+              />
+            </div>
+            <ArrowUpRight size={24} />
+          </Link>
+          <Link href="/search?max_pages=250" className="collection-tile short">
+            <span className="collection-number">03 / SMALL WONDERS</span>
+            <h3>
+              A few pages.
+              <br />
+              <em>A lasting impression.</em>
+            </h3>
+            <p>Find a good read under 250 pages.</p>
+            <div className="collection-covers">
+              <img
+                src="/images/covers/little-prince.jpg"
+                alt="The Little Prince cover"
+              />
+              <img
+                src="/images/covers/animal-farm.jpg"
+                alt="Animal Farm cover"
+              />
+            </div>
+            <ArrowUpRight size={24} />
+          </Link>
+        </div>
+      </section>
       <section className="editorial-banner wrap">
         <div className="editorial-photo">
           <img
@@ -243,16 +327,40 @@ export function HomePage() {
           ))}
         </div>
       </section>
-      <section className="join-library wrap"><div><span className="eyebrow">A SHELF THAT GROWS WITH YOU</span><h2>Your discoveries deserve<br/><em>a place of their own.</em></h2><p>Save the books you find, keep private reading notes, and pick up where you left off.</p></div><div><Link className="button primary" href={account?'/dashboard':'/signup'}>{account?'Enter my reading room':'Create my account'} <ArrowUpRight size={17}/></Link><span>No account needed to explore.</span></div></section>
+      <section className="join-library wrap">
+        <div>
+          <span className="eyebrow">A SHELF THAT GROWS WITH YOU</span>
+          <h2>
+            Your discoveries deserve
+            <br />
+            <em>a place of their own.</em>
+          </h2>
+          <p>
+            Save the books you find, keep private reading notes, and pick up
+            where you left off.
+          </p>
+        </div>
+        <div>
+          <Link
+            className="button primary"
+            href={account ? "/dashboard" : "/signup"}
+          >
+            {account ? "Enter my reading room" : "Create my account"}{" "}
+            <ArrowUpRight size={17} />
+          </Link>
+          <span>No account needed to explore.</span>
+        </div>
+      </section>
     </div>
   );
 }
 
 export function DiscoverPage() {
   const [route, setRoute] = useState("familiar"),
-    [mode, setMode] = useState("");
+    [mode, setMode] = useState(""),
+    [subject, setSubject] = useState("");
   const { data, error, loading } = useData<{ books: Book[]; engine: string }>(
-    `books?limit=40&route=${route}&mode=${mode}`,
+    `books?limit=100&route=${route}&mode=${mode}&subject=${encodeURIComponent(subject)}`,
   );
   return (
     <div className="wrap page">
@@ -291,24 +399,72 @@ export function DiscoverPage() {
         <div className="chips">
           <button
             className={mode === "" ? "selected" : ""}
-            onClick={() => setMode("")}
+            onClick={() => {
+              setMode("");
+              setSubject("");
+            }}
           >
             All books
           </button>
           <button
             className={mode === "fiction" ? "selected" : ""}
-            onClick={() => setMode("fiction")}
+            onClick={() => {
+              setMode("fiction");
+              setSubject("");
+            }}
           >
             Stories
           </button>
           <button
             className={mode === "learning" ? "selected" : ""}
-            onClick={() => setMode("learning")}
+            onClick={() => {
+              setMode("learning");
+              setSubject("");
+            }}
           >
             Ideas & learning
           </button>
+          <button
+            className={mode === "academic" ? "selected" : ""}
+            onClick={() => setMode("academic")}
+          >
+            Academic & engineering
+          </button>
         </div>
       </div>
+      {mode === "academic" && (
+        <section className="academic-discovery">
+          <div>
+            <span className="eyebrow">READ TOWARD YOUR NEXT BREAKTHROUGH</span>
+            <h2>Build a stronger foundation.</h2>
+            <p>
+              Course companions for computing, engineering, mathematics, and
+              physics. Check the edition against your syllabus.
+            </p>
+          </div>
+          <label>
+            Academic subject
+            <select
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            >
+              <option value="">Every subject</option>
+              {[
+                "computer science",
+                "mechanical engineering",
+                "electrical engineering",
+                "civil engineering",
+                "mathematics",
+                "physics",
+              ].map((s) => (
+                <option key={s} value={s}>
+                  {s.replace(/\b\w/g, (c) => c.toUpperCase())}
+                </option>
+              ))}
+            </select>
+          </label>
+        </section>
+      )}
       <div className="section-heading compact">
         <h2>
           {route === "familiar"
@@ -318,13 +474,15 @@ export function DiscoverPage() {
               : "An unexpected next chapter"}
         </h2>
         <span className="fineprint">
-          {data?.books.length || 0} books · Demo library
+          {loading
+            ? "Loading books…"
+            : `${data?.books.length || 0} books · Demo library`}
         </span>
       </div>
       {error ? (
         <Empty title="Couldn’t open the catalog" text={error} />
       ) : loading ? (
-        <Loading />
+        <BookGridLoading />
       ) : (
         <div className="book-grid">
           {data?.books.map((b) => (
@@ -348,6 +506,8 @@ const genres = [
   "History",
   "Personal growth",
   "Memoir",
+  "Engineering",
+  "Mathematics",
 ];
 export function SearchPage() {
   return (
@@ -405,6 +565,27 @@ function SearchInner() {
             "Dark",
           ].map((g) => (
             <option key={g}>{g}</option>
+          ))}
+        </select>
+      </label>
+      <label>
+        Academic subject
+        <select
+          value={params.get("subject") || ""}
+          onChange={(e) => change("subject", e.target.value)}
+        >
+          <option value="">Every subject</option>
+          {[
+            "computer science",
+            "mechanical engineering",
+            "electrical engineering",
+            "civil engineering",
+            "mathematics",
+            "physics",
+          ].map((s) => (
+            <option key={s} value={s}>
+              {s.replace(/\b\w/g, (c) => c.toUpperCase())}
+            </option>
           ))}
         </select>
       </label>

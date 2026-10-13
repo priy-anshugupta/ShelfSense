@@ -69,6 +69,16 @@ export default function BookDetail({
           <p className="detail-author">by {b.author}</p>
           <Availability book={b} />
           <p className="detail-description">{b.description}</p>
+          {b.source_url && (
+            <a
+              className="text-link"
+              href={b.source_url}
+              target="_blank"
+              rel="noreferrer"
+            >
+              View the publisher / library record <ArrowUpRight size={14} />
+            </a>
+          )}
           <div className="detail-facts">
             <span>
               <strong>{b.pages}</strong> pages

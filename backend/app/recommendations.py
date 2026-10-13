@@ -1,11 +1,14 @@
 import os
 import re
+import json
+from sqlalchemy import select, literal, cast, Text, union_all
 from datetime import timezone
 from functools import lru_cache
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from .database import Book, Edition, Copy, Feedback, Shelf, Preference, now
+from .catalog_cache import catalog_metadata
 
 SYNONYMS = {
     'funny': 'humor', 'uplifting': 'hope', 'hopeful': 'hope', 'lighthearted': 'humor',
@@ -40,17 +43,34 @@ def semantic_model():
 def semantic_index(documents):
     return semantic_model().encode(list(documents), normalize_embeddings=True)
 
-def load_inventory(db, work_ids):
+def load_inventory(db, work_ids, editions=None):
     """Fetch a request's editions and copies in two queries, without stale caching."""
     ids=list(set(work_ids))
-    editions_by_work={id:[] for id in ids}
+    editions_by_work={id:[] for id in ids} if editions is None else {id:editions.get(id,()) for id in ids}
     copies_by_edition={}
     if ids:
-        for edition in db.query(Edition).filter(Edition.work_id.in_(ids)).all():
-            editions_by_work[edition.work_id].append(edition)
+        if editions is None:
+            for edition in db.query(Edition).filter(Edition.work_id.in_(ids)).all():
+                editions_by_work[edition.work_id].append(edition)
         for copy in db.query(Copy).join(Edition,Copy.edition_id==Edition.id).filter(Edition.work_id.in_(ids)).all():
             copies_by_edition.setdefault(copy.edition_id,[]).append(copy)
     return editions_by_work,copies_by_edition
+
+def reader_context(db,owner):
+    """One scoped round trip for preferences, feedback and finished-work IDs."""
+    if not owner:
+        return {},[],set()
+    statement=union_all(
+        select(literal('preferences'),literal(''),cast(Preference.data,Text)).where(Preference.owner==owner),
+        select(literal('feedback'),Feedback.work_id,Feedback.reason).where(Feedback.owner==owner),
+        select(literal('finished'),Shelf.work_id,Shelf.status).where(Shelf.owner==owner,Shelf.status=='finished'),
+    )
+    profile={};feedback=[];read=set()
+    for kind,id,value in db.execute(statement):
+        if kind=='preferences':profile=json.loads(value)
+        elif kind=='feedback':feedback.append((id,value))
+        elif kind=='finished':read.add(id)
+    return profile,feedback,read
 
 def inventory(db, work_id, branch='', language='', max_pages=None, snapshot=None):
     snapshot=snapshot if snapshot is not None else load_inventory(db,[work_id])
@@ -72,7 +92,9 @@ def inventory(db, work_id, branch='', language='', max_pages=None, snapshot=None
 
 def view_book(db, b, constraints=None, snapshot=None):
     constraints = constraints or {}
-    snapshot=snapshot if snapshot is not None else load_inventory(db,[b['id']])
+    if snapshot is None:
+        _,editions=catalog_metadata(db)
+        snapshot=load_inventory(db,[b['id']],editions)
     copies = inventory(db, b['id'], constraints.get('branch',''), constraints.get('language',''), constraints.get('max_pages'),snapshot)
     editions = [dict(id=e.id, isbn=e.isbn, pages=e.pages, language=e.language) for e in snapshot[0].get(b['id'],[])]
     return {**b, 'copies': copies, 'editions': editions, 'available': sum(c['status']=='available' for c in copies), 'availability': 'available' if any(c['status']=='available' for c in copies) else 'checked_out' if any(c['status']=='checked_out' for c in copies) else 'unknown'}
@@ -81,10 +103,10 @@ def rank(db, query='', constraints=None, owner='', exclude=None, route='familiar
     constraints = constraints or {}
     exclude = set(exclude or [])
     pins = pins or []
-    books = [x.data for x in db.query(Book).order_by(Book.id).all()]
+    books,editions = catalog_metadata(db)
     if not books:
         return [], 'lexical'
-    snapshot=load_inventory(db,[b['id'] for b in books])
+    snapshot=load_inventory(db,[b['id'] for b in books],editions)
     books_by_id={b['id']:b for b in books}
     docs = tuple(document(b) for b in books)
     vectorizer, matrix = lexical_index(docs)
@@ -100,12 +122,10 @@ def rank(db, query='', constraints=None, owner='', exclude=None, route='familiar
             pass
     lexical = cosine_similarity(vectorizer.transform([effective_query]), matrix)[0] if effective_query.strip() else np.zeros(len(books))
     similarities = semantic if semantic is not None else lexical
-    profile = db.get(Preference, owner)
-    interests = profile.data.get('interests', []) if profile else []
-    feedback = db.query(Feedback).filter_by(owner=owner).all() if owner else []
-    negative_genres = {books_by_id[f.work_id]['genre'] for f in feedback if f.reason == 'not_for_me' and f.work_id in books_by_id}
-    read = {s.work_id for s in db.query(Shelf).filter_by(owner=owner, status='finished').all()} if owner else set()
-    banned_tags = set(profile.data.get('exclusions', [])) if profile else set()
+    profile,feedback,read=reader_context(db,owner)
+    interests = profile.get('interests', [])
+    negative_genres = {books_by_id[id]['genre'] for id,reason in feedback if reason == 'not_for_me' and id in books_by_id}
+    banned_tags = set(profile.get('exclusions', []))
     candidates = []
     tokens = set(re.findall(r'[\w-]+', effective_query))
     for i,b in enumerate(books):
@@ -117,7 +137,11 @@ def rank(db, query='', constraints=None, owner='', exclude=None, route='familiar
             continue
         if constraints.get('level') and b['level'] != constraints['level']:
             continue
-        if constraints.get('mode') == 'learning' and b['genre'] not in ['Technology','Science','Design','Psychology','History','Personal growth']:
+        if constraints.get('mode') == 'learning' and b['genre'] not in ['Technology','Science','Design','Psychology','History','Personal growth','Engineering','Mathematics']:
+            continue
+        if constraints.get('mode') == 'academic' and 'academic' not in b['tags']:
+            continue
+        if constraints.get('subject') and constraints['subject'] not in [b.get('subject'),*b['tags']]:
             continue
         if constraints.get('mode') == 'fiction' and b['genre'] not in ['Fiction','Science fiction','Fantasy','Mystery']:
             continue
@@ -190,4 +214,11 @@ def extract_rules(text, current=None):
     for branch in ['Central Library','Study Annex']:
         if branch.lower() in lower:
             state['branch']=branch
+    if 'academic' in lower or 'textbook' in lower:
+        state['mode']='academic'
+    for subject in ['mechanical engineering','electrical engineering','civil engineering','computer science','mathematics','physics']:
+        if subject in lower:
+            state['subject']=subject
+    if 'any subject' in lower:
+        state.pop('subject',None)
     return state

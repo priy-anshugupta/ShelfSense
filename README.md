@@ -26,9 +26,11 @@ The project combines an editorial reading experience with practical library oper
 
 **Run it without cloud credentials.** SQLite, local accounts, catalog search, and deterministic recommendations work out of the box. An OpenAI key activates the specialist workflow; PostgreSQL and Supabase Auth are optional integrations.
 
-> **Release scope:** a functional AI subject project with 40 real titles, project-curated metadata, and fictional sample inventory. Desktop is the target. Live OpenAI, hosted PostgreSQL, and Supabase flows require credentials for end-to-end verification.
+> **Release scope:** a functional AI subject project with 54 real titles, project-curated metadata, and fictional sample inventory. Desktop is the target. Live OpenAI, hosted PostgreSQL, and Supabase flows require credentials for end-to-end verification.
 
 ## Features
+
+The catalog includes **14 academic additions** for computer science, electrical/mechanical engineering, mathematics, and physics. Discover offers an Academic & engineering tab and subject filters. See the [academic catalog and metadata sources](docs/ACADEMIC-CATALOG.md).
 
 | For readers                                                              | For librarians                                                |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------- |
@@ -38,7 +40,7 @@ The project combines an editorial reading experience with practical library oper
 | Inspect catalog evidence and compare up to three books                   | Preview and validate CSV imports before committing            |
 | Save books as Up next, Reading, Finished, or Set aside                   | Repeat-safe import commits and audited changes                |
 | Keep private ratings, notes, and reading progress                        | Aggregate reader insights                                     |
-| Follow three curated learning paths and AI-assisted sequences            | Agent workspace with configured roles and latest-run counts   |
+| Follow four curated learning paths and AI-assisted sequences            | Agent workspace with configured roles and latest-run counts   |
 | Create an account, recover access, export data, and manage preferences   | Staff authorization enforced by the backend outside demo mode |
 
 ### A reading room of your own
@@ -212,7 +214,7 @@ Then set this in `backend/.env` and restart the backend:
 EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
 ```
 
-The first model download requires internet and adds startup time. Cached embeddings run locally without an API key. Leave the variable blank for lightweight TF-IDF retrieval. Hindi edition filtering is supported; this English embedding model does not establish reliable Hindi or Hinglish semantic retrieval.
+The first model download requires internet and adds startup time. Cached embeddings run locally without an API key. Shared catalog metadata is cached for 120 seconds (configurable with `CATALOG_CACHE_SECONDS`); reader context and copy availability remain live, and staff metadata commits invalidate the cache. Leave the variable blank for lightweight TF-IDF retrieval. Hindi edition filtering is supported; this English embedding model does not establish reliable Hindi or Hinglish semantic retrieval.
 
 ## Configuration
 
@@ -301,7 +303,7 @@ npm.cmd run typecheck
 npm.cmd run build
 ```
 
-**Verified release:** 27 backend tests, TypeScript checking, production build, HTTP gateway checks, and desktop browser flows. Coverage includes account recovery/session revocation, ownership, guest claiming, staff permissions, edition constraints, stale availability, import validation, revisions/undo, catalog evidence, and mocked agent tool boundaries.
+**Verified release:** 31 backend tests, TypeScript checking, production build, HTTP gateway checks, and desktop browser flows. Coverage includes account recovery/session revocation, ownership, guest claiming, staff permissions, edition constraints, stale availability, import validation, revisions/undo, catalog evidence, and mocked agent tool boundaries.
 
 Desktop checks cover signup, onboarding, sign-in/out, shelf persistence, reading dashboard updates, streamed local recommendations, and staff screens. Live OpenAI, optional Supabase, and hosted PostgreSQL remain credential-dependent. Read the [verification record](docs/VERIFICATION.md) for the exact scope.
 
@@ -317,7 +319,7 @@ These scenarios assume demonstration inventory is fresh. Refresh the relevant sa
 
 ### Measured recommendation experiment
 
-The checked-in experiment uses **12 project-authored queries against 40 titles**:
+The checked-in experiment uses **12 project-authored queries against the original 40-title catalog**. The live catalog now has 54 titles; these historical results do not evaluate the 14 new academic additions:
 
 | Metric      | Sentence Transformer hybrid | TF-IDF baseline |
 | ----------- | --------------------------: | --------------: |
