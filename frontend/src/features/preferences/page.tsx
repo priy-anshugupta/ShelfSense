@@ -39,7 +39,9 @@ export default function PreferencesPage() {
     [busy, setBusy] = useState(false);
   useEffect(() => {
     api<Preferences>("me/preferences")
-      .then(setP)
+      .then((preferences) =>
+        setP({ ...preferences, branch: "Central Library" }),
+      )
       .catch((e) => notify(e.message));
   }, [notify]);
   const toggle = (t: string) =>
@@ -93,28 +95,10 @@ export default function PreferencesPage() {
               </button>
             ))}
           </div>
-          <div className="preferences-fields">
-            <label>
-              Home library
-              <select
-                value={p.branch}
-                onChange={(e) => setP({ ...p, branch: e.target.value })}
-              >
-                <option>Central Library</option>
-                <option>Study Annex</option>
-              </select>
-            </label>
-            <label>
-              Preferred book language
-              <select
-                value={p.language}
-                onChange={(e) => setP({ ...p, language: e.target.value })}
-              >
-                <option value="eng">English</option>
-                <option value="hin">Hindi</option>
-              </select>
-            </label>
-          </div>
+          <p className="fineprint">
+            The current catalog contains English editions. More languages can be
+            added as the collection grows.
+          </p>
           <label className="checkbox-label">
             <input
               type="checkbox"
@@ -126,8 +110,8 @@ export default function PreferencesPage() {
             Exclude catalog-tagged romance
           </label>
           <p className="fineprint">
-            Language applies when explicitly selected in search. Exclusions use
-            curated tags; absent tags are not verified content warnings.
+            Exclusions use curated tags; absent tags are not verified content
+            warnings.
           </p>
           <button className="button primary" disabled={busy} onClick={save}>
             {busy ? "Saving…" : "Save my preferences"}

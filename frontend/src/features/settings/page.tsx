@@ -71,10 +71,7 @@ export default function SettingsPage() {
         </section>
         <section className="settings-card">
           <h2>Your reading taste</h2>
-          <p>
-            Update interests, choose your home branch, or reset learned
-            feedback.
-          </p>
+          <p>Update your reading interests or reset learned feedback.</p>
           <Link href="/preferences" className="button secondary">
             Edit preferences <ArrowUpRight size={15} />
           </Link>

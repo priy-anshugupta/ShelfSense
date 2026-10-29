@@ -102,6 +102,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     );
   };
   const remove = async (id: string) => {
+    const entry = shelf.find((item) => item.book.id === id);
+    if (
+      entry &&
+      !window.confirm(
+        `Remove “${entry.book.title}” from your shelf? This also deletes its private notes, rating, and reading progress. This cannot be undone.`,
+      )
+    )
+      return;
     await api(`me/shelf/${id}`, { method: "DELETE" });
     await refresh();
     setToast("Removed from your shelf.");
