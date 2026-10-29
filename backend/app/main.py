@@ -186,7 +186,7 @@ def books(q:str='',genre:str='',mood:str='',level:str='',mode:str='',subject:str
         constraints=Constraints(genre=genre,mood=mood,level=level,mode=mode,subject=subject,language=language,branch=branch,max_pages=max_pages,available_only=available_only).model_dump()
     except ValidationError:
         raise HTTPException(422,'One or more search filters are invalid.')
-    results,engine=rank(db,q,constraints,owner,route=route,limit=100 if featured_only else limit)
+    results,engine=rank(db,q,constraints,owner,route=route,limit=100 if featured_only else limit,include_finished=True)
     if featured_only:
         results=[b for b in results if b.get('featured')][:limit]
     return {'books':results,'total':len(results),'engine':engine}
@@ -196,6 +196,13 @@ def book(work_id:str,owner=Depends(identity),db:Session=Depends(get_db)):
     b=book_or_404(db,work_id)
     similar,_=rank(db,' '.join(b.data['tags']),owner=owner,exclude=[work_id],limit=5)
     return {'book':view_book(db,b.data),'similar':similar}
+
+@app.get('/api/v1/recommendations')
+def reading_suggestions(limit:int=5,owner=Depends(identity),db:Session=Depends(get_db)):
+    if limit<1 or limit>50:
+        raise HTTPException(422,'Invalid recommendation limit.')
+    items,engine=rank(db,owner=owner,limit=limit)
+    return {'books':items,'engine':engine}
 
 @app.post('/api/v1/recommendations')
 def recommend(payload:RecommendationInput,owner=Depends(identity),db:Session=Depends(get_db)):

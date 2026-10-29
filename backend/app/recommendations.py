@@ -99,7 +99,7 @@ def view_book(db, b, constraints=None, snapshot=None):
     editions = [dict(id=e.id, isbn=e.isbn, pages=e.pages, language=e.language) for e in snapshot[0].get(b['id'],[])]
     return {**b, 'copies': copies, 'editions': editions, 'available': sum(c['status']=='available' for c in copies), 'availability': 'available' if any(c['status']=='available' for c in copies) else 'checked_out' if any(c['status']=='checked_out' for c in copies) else 'unknown'}
 
-def rank(db, query='', constraints=None, owner='', exclude=None, route='familiar', limit=12, pins=None):
+def rank(db, query='', constraints=None, owner='', exclude=None, route='familiar', limit=12, pins=None, include_finished=False):
     constraints = constraints or {}
     exclude = set(exclude or [])
     pins = pins or []
@@ -129,7 +129,7 @@ def rank(db, query='', constraints=None, owner='', exclude=None, route='familiar
     candidates = []
     tokens = set(re.findall(r'[\w-]+', effective_query))
     for i,b in enumerate(books):
-        if b['id'] in exclude | read or banned_tags.intersection(b['tags']):
+        if b['id'] in exclude or (not include_finished and b['id'] in read) or banned_tags.intersection(b['tags']):
             continue
         if constraints.get('genre') and b['genre'] != constraints['genre']:
             continue

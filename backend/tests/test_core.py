@@ -87,10 +87,22 @@ def test_remix_undo_and_monotonic_version(client):
     assert not restored['constraints'].get('exclude_romance')
     assert restored['pins']==['hope']
 
-def test_finished_books_are_excluded(client):
+def test_finished_books_remain_searchable_but_are_not_recommended(client):
+    c,_=client
+    assert c.put('/api/v1/me/shelf/alchemist',json={'status':'finished','progress':100,'note':'Keep my reading notes'}).status_code==200
+    results=c.get('/api/v1/books?q=The%20Alchemist').json()['books']
+    assert results[0]['id']=='alchemist'
+    recommendations=c.post('/api/v1/recommendations',json={'query':'The Alchemist','limit':50}).json()['books']
+    assert all(b['id']!='alchemist' for b in recommendations)
+    assert all(b['id']!='alchemist' for b in c.get('/api/v1/recommendations?limit=50').json()['books'])
+    assert c.get('/api/v1/me/shelf').json()['entries'][0]['note']=='Keep my reading notes'
+
+
+def test_already_read_feedback_keeps_catalog_searchable(client):
     c,_=client
     c.post('/api/v1/feedback',json={'work_id':'alchemist','reason':'already_read'})
-    assert all(b['id']!='alchemist' for b in c.get('/api/v1/books').json()['books'])
+    assert any(b['id']=='alchemist' for b in c.get('/api/v1/books').json()['books'])
+    assert all(b['id']!='alchemist' for b in c.post('/api/v1/recommendations',json={'query':'hopeful','limit':50}).json()['books'])
 
 def test_invalid_rating_rejected(client):
     c,_=client

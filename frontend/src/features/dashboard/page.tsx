@@ -16,7 +16,9 @@ import { Cover, BookCard } from "@/components/book-card";
 import { Loading, Empty } from "@/components/ui";
 export default function Dashboard() {
   const { account, shelf, ready, config } = useApp();
-  const { data, loading, error } = useData<{ books: Book[] }>("books?limit=5");
+  const { data, loading, error } = useData<{ books: Book[] }>(
+    "recommendations?limit=5",
+  );
   const reading = shelf.filter((e) => e.status === "reading"),
     next = shelf.filter((e) => e.status === "want_to_read");
   if (!ready) return <Loading />;
