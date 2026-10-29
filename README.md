@@ -72,7 +72,7 @@ Screenshots show the local demonstration interface. The personal dashboard uses 
 
 ## AI workflow
 
-ShelfSense uses four separately prompted specialist roles through the **OpenAI Responses API**, with one configurable model. The workflow is bounded and sequential; the learning specialist runs for learning goals.
+ShelfSense uses four separately prompted specialist roles through the **OpenAI Responses API**, with one configurable model. The workflow is bounded and sequential; the learning specialist runs for learning goals. Ordinary recommendations use the coordinator, a direct server catalog search, and the critic, avoiding model calls for tool selection. Learning and comparison requests retain specialist tool selection.
 
 | Role                     | Responsibility                                         | Boundary                                                 |
 | ------------------------ | ------------------------------------------------------ | -------------------------------------------------------- |
@@ -398,3 +398,17 @@ Current boundaries:
 Cover artwork is cached from [Open Library](https://openlibrary.org/dev/docs/api/covers). Library photography is sourced from Unsplash; individual sources are recorded in the asset documentation. The reading-room artwork is an original AI-generated editorial illustration, not a photograph of a real campus. Inter and Fraunces are self-hosted fonts; licensing details are in the asset notes. Third-party cover artwork is not assumed to be public domain.
 
 This repository does not currently include a project-wide software license. Third-party assets retain their respective rights and licensing terms.
+
+
+### Reader workflow simplification
+
+Reader pages focus on discovery, recommendations, personal shelves, and links to external book providers. Book detail pages offer Amazon India and Open Library searches; these do not imply stock, price, or full-text access. Branch selection, fictional copy availability, and empty language choices are removed from the reader interface; inventory administration remains in the staff workspace. Existing copy records are retained without relabeling stale observations as current.
+
+Finished books remain searchable in the catalog but are excluded from recommendations. Removing a shelf entry asks for confirmation explaining that its journal data will be deleted. Advanced preferences and agent traces are collapsed by default, and homepage requests submit automatically after the librarian session initializes.
+
+
+### Live web book search
+
+Set `SERPAPI_API_KEY` in the ignored `backend/.env` file and restart the backend. Use **Search the web** from Discover, catalog search, or the librarian shortlist. The backend uses SerpAPI’s `google_play_books` engine with India/English localization, validates individual Google Play Books links, removes duplicates and series, and returns up to 20 external listings. It never returns provider credentials or raw provider metadata.
+
+Web searches send only the typed query to SerpAPI; account data and private notes are not sent. External results are separate from catalog inventory and cannot be saved to the local shelf in this version. Catalog filters do not apply to web results. The provider page determines current edition details, reading access, and purchase options. Empty results and provider failures leave catalog search available. Results are cached for ten minutes with a bounded cache and searches are limited to ten per reader per minute.
