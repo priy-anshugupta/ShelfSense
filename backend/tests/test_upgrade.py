@@ -65,7 +65,7 @@ def fake_model(plan,review,call):
 
 def test_openai_tools_enforce_constraints_and_catalog_ids(client,monkeypatch):
     _,sessions=client
-    plan=agents.Plan(intent='recommend',search_query='short thoughtful books',constraints=Constraints(max_pages=250),question='')
+    plan=agents.Plan(intent='compare',search_query='short thoughtful books',constraints=Constraints(max_pages=250),question='')
     review=agents.Review(preferred_work_ids=['invented-id','alchemist'],unsuitable_work_ids=[])
     call=Obj(type='function_call',name='search_catalog',arguments='{"query":"thoughtful books"}',call_id='call1')
     model=fake_model(plan,review,call)
@@ -81,7 +81,7 @@ def test_openai_tools_enforce_constraints_and_catalog_ids(client,monkeypatch):
 
 def test_unretrieved_tool_id_falls_back(client,monkeypatch):
     _,sessions=client
-    plan=agents.Plan(intent='recommend',search_query='short books',constraints=Constraints(),question='')
+    plan=agents.Plan(intent='compare',search_query='short books',constraints=Constraints(),question='')
     call=Obj(type='function_call',name='inspect_books',arguments='{"work_ids":["invented-id"]}',call_id='call1')
     model=fake_model(plan,agents.Review(preferred_work_ids=[],unsuitable_work_ids=[]),call)
     monkeypatch.setenv('OPENAI_API_KEY','mock-test-key');monkeypatch.setattr(agents,'client_factory',lambda:model)
@@ -108,3 +108,18 @@ def test_missing_key_trace_is_honest(client):
     saved=c.get(f"/api/v1/sessions/{s['id']}").json()
     assert saved['provider']=='local' and saved['agent_trace'][0]['mode']=='local'
     assert saved['tools_used']==['search_catalog','check_availability']
+
+
+def test_ordinary_recommendations_skip_model_tool_selection(client,monkeypatch):
+    _,sessions=client
+    plan=agents.Plan(intent='recommend',search_query='hopeful short books',constraints=Constraints(max_pages=250),question='')
+    model=fake_model(plan,agents.Review(preferred_work_ids=['invented-id'],unsuitable_work_ids=[]),None)
+    monkeypatch.setenv('OPENAI_API_KEY','mock-test-key')
+    monkeypatch.setattr(agents,'client_factory',lambda:model)
+    with sessions() as db: events=asyncio.run(collect(db,'A hopeful book under 250 pages'))
+    result=events[-1][1]
+    assert result['provider']=='openai' and result['books']
+    assert all(b['pages']<=250 and b['id']!='invented-id' for b in result['books'])
+    model.responses.create.assert_not_awaited()
+    assert model.responses.parse.await_count==2
+    assert result['tools_used']==['search_catalog']
