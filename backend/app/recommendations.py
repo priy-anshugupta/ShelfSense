@@ -131,19 +131,20 @@ def rank(db, query='', constraints=None, owner='', exclude=None, route='familiar
     for i,b in enumerate(books):
         if b['id'] in exclude or (not include_finished and b['id'] in read) or banned_tags.intersection(b['tags']):
             continue
-        if constraints.get('genre') and b['genre'] != constraints['genre']:
+        if constraints.get('genre') and b['genre'].lower() != str(constraints['genre']).lower():
             continue
-        if constraints.get('mood') and b['mood'] != constraints['mood']:
+        if constraints.get('mood') and b['mood'].lower() != str(constraints['mood']).lower():
             continue
-        if constraints.get('level') and b['level'] != constraints['level']:
+        if constraints.get('level') and b['level'].lower() != str(constraints['level']).lower():
             continue
-        if constraints.get('mode') == 'learning' and b['genre'] not in ['Technology','Science','Design','Psychology','History','Personal growth','Engineering','Mathematics']:
-            continue
+        if not constraints.get('genre'):
+            if constraints.get('mode') == 'learning' and b['genre'] not in ['Technology','Science','Design','Psychology','History','Personal growth','Engineering','Mathematics']:
+                continue
+            if constraints.get('mode') == 'fiction' and b['genre'] not in ['Fiction','Science fiction','Fantasy','Mystery']:
+                continue
         if constraints.get('mode') == 'academic' and 'academic' not in b['tags']:
             continue
         if constraints.get('subject') and constraints['subject'] not in [b.get('subject'),*b['tags']]:
-            continue
-        if constraints.get('mode') == 'fiction' and b['genre'] not in ['Fiction','Science fiction','Fantasy','Mystery']:
             continue
         item = view_book(db,b,constraints,snapshot)
         if (constraints.get('max_pages') is not None or constraints.get('language')) and not any((not constraints.get('language') or e['language']==constraints['language']) and (constraints.get('max_pages') is None or e['pages'] is not None and e['pages']<=constraints['max_pages']) for e in item['editions']):
@@ -181,44 +182,83 @@ def rank(db, query='', constraints=None, owner='', exclude=None, route='familiar
 
 def extract_rules(text, current=None):
     state = dict(current or {})
-    lower=text.lower()
-    pages=re.search(r'(?:under|below|less than|max(?:imum)?|up to)\s*(\d{2,4})\s*(?:pages?)?',lower)
+    lower = text.lower()
+    pages = re.search(r'(?:under|below|less than|max(?:imum)?|up to)\s*(\d{2,4})\s*(?:pages?)?', lower)
     if pages:
-        state['max_pages']=int(pages.group(1))
+        state['max_pages'] = int(pages.group(1))
     if 'shorter' in lower or 'short book' in lower or 'short read' in lower:
-        previous=state.get('max_pages')
-        state['max_pages']=max(50,int(previous*.8)) if previous and 'shorter' in lower else min(previous or 10000,300)
+        previous = state.get('max_pages')
+        state['max_pages'] = max(50, int(previous * .8)) if previous and 'shorter' in lower else min(previous or 10000, 300)
     if 'available' in lower:
-        state['available_only']=True
+        state['available_only'] = True
     if 'any length' in lower or 'remove page limit' in lower:
-        state.pop('max_pages',None)
+        state.pop('max_pages', None)
     if 'include unavailable' in lower:
-        state['available_only']=False
+        state['available_only'] = False
     if 'beginner' in lower or 'maths weak' in lower:
-        state['level']='Beginner'
+        state['level'] = 'Beginner'
     if 'no romance' in lower or 'without romance' in lower or 'remove romance' in lower:
-        state['exclude_romance']=True
-    if re.search(r'\b(hindi|हिंदी)\b',lower):
-        state['language']='hin'
-    if re.search(r'\benglish\b',lower):
-        state['language']='eng'
-    for genre in ['science fiction','mystery','fantasy','memoir','history','psychology']:
-        if re.search(r'\b'+genre+r'\b',lower):
-            state['genre']=genre.title() if genre!='science fiction' else 'Science fiction'
+        state['exclude_romance'] = True
+    if re.search(r'\b(hindi|हिंदी)\b', lower):
+        state['language'] = 'hin'
+    if re.search(r'\benglish\b', lower):
+        state['language'] = 'eng'
+    GENRE_MAP = {
+        'science fiction': 'Science fiction',
+        'sci fi': 'Science fiction',
+        'sci-fi': 'Science fiction',
+        'fantasy': 'Fantasy',
+        'mystery': 'Mystery',
+        'fiction': 'Fiction',
+        'memoir': 'Memoir',
+        'history': 'History',
+        'psychology': 'Psychology',
+        'personal growth': 'Personal growth',
+        'self help': 'Personal growth',
+        'technology': 'Technology',
+        'science': 'Science',
+        'design': 'Design',
+        'engineering': 'Engineering',
+        'mathematics': 'Mathematics',
+        'maths': 'Mathematics',
+    }
+    for phrase in sorted(GENRE_MAP.keys(), key=len, reverse=True):
+        if re.search(r'\b' + re.escape(phrase) + r'\b', lower):
+            state['genre'] = GENRE_MAP[phrase]
+            break
     if 'any genre' in lower:
-        state.pop('genre',None)
+        state.pop('genre', None)
+    MOOD_MAP = {
+        'reflective': 'Reflective',
+        'hopeful': 'Hopeful',
+        'thoughtful': 'Thoughtful',
+        'funny': 'Funny',
+        'humorous': 'Funny',
+        'adventurous': 'Adventurous',
+        'mysterious': 'Mysterious',
+        'practical': 'Practical',
+        'emotional': 'Emotional',
+        'suspenseful': 'Suspenseful',
+        'dark': 'Dark',
+    }
+    for phrase in sorted(MOOD_MAP.keys(), key=len, reverse=True):
+        if re.search(r'\b' + re.escape(phrase) + r'\b', lower):
+            state['mood'] = MOOD_MAP[phrase]
+            break
+    if 'any mood' in lower:
+        state.pop('mood', None)
     if 'any level' in lower:
-        state.pop('level',None)
+        state.pop('level', None)
     if 'include romance' in lower:
-        state['exclude_romance']=False
-    for branch in ['Central Library','Study Annex']:
+        state['exclude_romance'] = False
+    for branch in ['Central Library', 'Study Annex']:
         if branch.lower() in lower:
-            state['branch']=branch
+            state['branch'] = branch
     if 'academic' in lower or 'textbook' in lower:
-        state['mode']='academic'
-    for subject in ['mechanical engineering','electrical engineering','civil engineering','computer science','mathematics','physics']:
+        state['mode'] = 'academic'
+    for subject in ['mechanical engineering', 'electrical engineering', 'civil engineering', 'computer science', 'mathematics', 'physics']:
         if subject in lower:
-            state['subject']=subject
+            state['subject'] = subject
     if 'any subject' in lower:
-        state.pop('subject',None)
+        state.pop('subject', None)
     return state

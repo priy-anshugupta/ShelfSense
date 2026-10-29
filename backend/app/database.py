@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from sqlalchemy import create_engine, String, JSON, Integer, DateTime, Text, ForeignKey, UniqueConstraint, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
@@ -118,6 +118,13 @@ def initialize():
         existing={id for (id,) in db.query(Book.id).all()}
         additions=[(index,data) for index,data in enumerate(seed_books()) if data['id'] not in existing]
         if not additions:
+            if os.getenv('DEMO_MODE', '').lower() == 'true':
+                threshold = float(os.getenv('INVENTORY_FRESHNESS_HOURS', '24'))
+                cutoff = now() - timedelta(hours=threshold)
+                total = db.query(Copy).count()
+                if total > 0 and db.query(Copy).filter(Copy.updated_at < cutoff).count() == total:
+                    db.query(Copy).update({Copy.updated_at: now()})
+                    db.commit()
             return
         # Add missing seed works only; retain staff edits and all reader data.
         db.add_all([Book(id=data['id'],data=data) for _,data in additions])
