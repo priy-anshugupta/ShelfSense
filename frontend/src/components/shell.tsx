@@ -141,14 +141,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
               Our approach <ArrowUpRight size={13} />
             </Link>
             <Link href="/evaluation">Project evaluation</Link>
-            {config?.staff && <Link href="/admin">Library dashboard</Link>}
+
             <Link href="/settings">Settings & privacy</Link>
           </div>
           <div className="footer-note">
             <span className="status-dot" />
             {config?.demo
-              ? "Demo library · sample inventory"
-              : "Library discovery"}
+              ? "Book discovery · curated catalog"
+              : "Book discovery"}
             <small>Made for curious minds.</small>
           </div>
         </footer>

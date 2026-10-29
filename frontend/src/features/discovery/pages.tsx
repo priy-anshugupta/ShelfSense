@@ -19,6 +19,7 @@ import type { Book } from "@/lib/types";
 import { BookCard } from "@/components/book-card";
 import { Loading, BookGridLoading, Empty, Modal } from "@/components/ui";
 import { useApp } from "@/components/provider";
+import { WebBookSearch } from "./web-search";
 
 const moods = [
   ["A little escape", "Fantasy"],
@@ -40,7 +41,7 @@ function SearchBox({ large = false }: { large?: boolean }) {
       <Search size={20} />
       <input
         aria-label="Describe your next read"
-        placeholder="A book, a mood, a little curiosity…"
+        placeholder="Describe what you want to read…"
         value={q}
         onChange={(e) => setQ(e.target.value)}
         maxLength={1500}
@@ -77,9 +78,8 @@ export function HomePage() {
             <br />A whole new <em>world.</em>
           </h1>
           <p className="hero-description">
-            For the books you didn’t know you were looking for.
-            <br className="desktop" /> A personal librarian, a thoughtful match,
-            your next great read.
+            Find your next book, understand why it fits, and save it to your
+            reading list.
           </p>
           <div className="hero-cta-row">
             <Link className="button primary" href="/discover">
@@ -108,7 +108,7 @@ export function HomePage() {
               <Check size={14} /> Picks with a reason
             </span>
             <span>
-              <BookOpen size={14} /> Find it in your library
+              <BookOpen size={14} /> Find where to get it
             </span>
           </div>
         </div>
@@ -316,7 +316,7 @@ export function HomePage() {
             [
               "03",
               "Turn the first page",
-              "Find an available copy, note its shelf, and make room for your next chapter.",
+              "Save your choice or follow a link to a bookstore or library record.",
             ],
           ].map(([n, t, p]) => (
             <div key={n}>
@@ -380,6 +380,11 @@ export function DiscoverPage() {
         </Link>
       </div>
       <SearchBox />
+      <p className="web-search-entry">
+        <Link className="text-link" href="/search?source=web">
+          Looking beyond the catalog? Search the web <ArrowUpRight size={14} />
+        </Link>
+      </p>
       <div className="discovery-controls">
         <div className="segmented" role="group" aria-label="Discovery route">
           {["familiar", "explore", "surprise"].map((r) => (
@@ -476,7 +481,7 @@ export function DiscoverPage() {
         <span className="fineprint">
           {loading
             ? "Loading books…"
-            : `${data?.books.length || 0} books · Demo library`}
+            : `${data?.books.length || 0} books in the catalog`}
         </span>
       </div>
       {error ? (
@@ -531,6 +536,8 @@ function SearchInner() {
     else p.delete(name);
     router.replace("/search?" + p.toString(), { scroll: false });
   };
+  if (params.get("source") === "web")
+    return <WebBookSearch query={params.get("q") || ""} />;
   const filter = (
     <>
       <label>
@@ -613,44 +620,11 @@ function SearchInner() {
           <option value="500">Under 500 pages</option>
         </select>
       </label>
-      <label>
-        Edition language
-        <select
-          value={params.get("language") || ""}
-          onChange={(e) => change("language", e.target.value)}
-        >
-          <option value="">Any language</option>
-          <option value="eng">English</option>
-          <option value="hin">Hindi</option>
-        </select>
-      </label>
-      <label>
-        Library branch
-        <select
-          value={params.get("branch") || ""}
-          onChange={(e) => change("branch", e.target.value)}
-        >
-          <option value="">All branches</option>
-          <option>Central Library</option>
-          <option>Study Annex</option>
-        </select>
-      </label>
-      <label className="checkbox-label">
-        <input
-          type="checkbox"
-          checked={params.get("available_only") === "true"}
-          onChange={(e) =>
-            change("available_only", e.target.checked ? "true" : "")
-          }
-        />{" "}
-        Available copies only
-      </label>
       <button className="text-button" onClick={() => router.replace("/search")}>
         Reset filters <X size={13} />
       </button>
       <p className="fineprint">
-        Sample inventory. Availability is verified only while its timestamp is
-        fresh.
+        Browse the catalog, then open a book to find where to get it.
       </p>
     </>
   );
@@ -665,6 +639,21 @@ function SearchInner() {
           <p>Search a title, a topic, or the kind of story you want.</p>
         </div>
       </div>
+      <nav className="search-source-tabs" aria-label="Search source">
+        <Link
+          aria-current="page"
+          href={"/search?q=" + encodeURIComponent(params.get("q") || "")}
+        >
+          Catalog
+        </Link>
+        <Link
+          href={
+            "/search?source=web&q=" + encodeURIComponent(params.get("q") || "")
+          }
+        >
+          Search the web
+        </Link>
+      </nav>
       <form
         className="catalog-search"
         onSubmit={(e) => {
@@ -708,7 +697,7 @@ function SearchInner() {
           ) : !data?.books.length ? (
             <Empty
               title="A little too specific?"
-              text="No verified matches fit these filters. Try a different mood, a longer page limit, or include unavailable books."
+              text="No verified matches fit these filters. Try a different mood or a longer page limit."
             >
               <button
                 className="button primary"

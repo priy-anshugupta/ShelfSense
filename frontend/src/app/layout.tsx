@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s · ShelfSense",
   },
   description:
-    "Find your next good read with a personal library assistant. Discover, refine, understand, and find books in your library.",
+    "Find your next book, understand why it fits, save your reading list, and find where to get it.",
   icons: { icon: "/favicon.svg" },
 };
 export default function RootLayout({

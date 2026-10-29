@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { X, ArrowUpRight } from "lucide-react";
 import { useApp } from "@/components/provider";
-import { Cover, Availability } from "@/components/book-card";
+import { Cover } from "@/components/book-card";
 import { Empty } from "@/components/ui";
 export default function ComparePage() {
   const { compare, toggleCompare } = useApp();
@@ -59,7 +59,6 @@ export default function ComparePage() {
                   </div>
                 ))}
               </dl>
-              <Availability book={b} />
               <Link className="button primary" href={"/books/" + b.id}>
                 Take a closer look <ArrowUpRight size={14} />
               </Link>

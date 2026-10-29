@@ -156,7 +156,6 @@ export function BookCard({
         </Link>
         <p className="book-author">{book.author}</p>
         {recommendation && <p className="book-reason">{book.reasons?.[0]}</p>}
-        <Availability book={book} />
         {recommendation && (
           <>
             <button

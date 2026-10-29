@@ -38,6 +38,7 @@ function LibrarianInner() {
     [mobileTab, setMobileTab] = useState("conversation"),
     [liveEvents, setLiveEvents] = useState<AgentEvent[]>([]),
     [pendingText, setPendingText] = useState("");
+  const autoSubmitted = useRef(false);
   const once = useRef(false),
     abort = useRef<AbortController | null>(null),
     end = useRef<HTMLDivElement | null>(null);
@@ -140,6 +141,13 @@ function LibrarianInner() {
       setPendingText("");
     }
   };
+  useEffect(() => {
+    const initialQuery = search.get("q");
+    if (session && !initialLoading && initialQuery && !autoSubmitted.current) {
+      autoSubmitted.current = true;
+      void send(initialQuery);
+    }
+  }, [session, initialLoading, search]);
   const newSession = async () => {
     try {
       const s = await api<Session>("sessions", { method: "POST" });
@@ -244,7 +252,7 @@ function LibrarianInner() {
                   <div className="suggested-requests">
                     {[
                       "A short, hopeful read under 300 pages",
-                      "A clever mystery available in the library",
+                      "A clever mystery with a surprising ending",
                       "Beginner-friendly books about artificial intelligence",
                     ].map((t) => (
                       <button key={t} disabled={busy} onClick={() => send(t)}>
@@ -319,13 +327,17 @@ function LibrarianInner() {
             )}
           </form>
           <p className="fineprint composer-note">
-            Real catalog books. Clear reasons. Sample library inventory.
+            Real catalog books. Clear reasons. Find where to get them from each
+            book page.
           </p>
-          <AgentActivity
-            events={busy ? liveEvents : session?.agent_trace || liveEvents}
-            busy={busy}
-            configured={!!config?.openai}
-          />
+          <details className="reader-advanced">
+            <summary>How recommendations work</summary>
+            <AgentActivity
+              events={busy ? liveEvents : session?.agent_trace || liveEvents}
+              busy={busy}
+              configured={!!config?.openai}
+            />
+          </details>
         </section>
         <section
           className={
@@ -345,75 +357,78 @@ function LibrarianInner() {
               <RotateCcw size={14} /> Undo
             </button>
           </div>
-          <div className="preference-tray">
-            <span className="fineprint">KEEP WHAT YOU LIKE</span>
-            <div className="chips">
-              {session?.pins.map((p) => (
-                <button className="selected" key={p} onClick={() => pin(p)}>
-                  <Pin size={12} />
-                  {p}
-                  <PinOff size={12} />
-                </button>
-              ))}
-              {["friendship", "problem-solving", "hope"]
-                .filter((p) => !session?.pins.includes(p))
-                .map((p) => (
-                  <button key={p} onClick={() => pin(p)}>
-                    <Plus size={12} />
+          <details className="reader-advanced">
+            <summary>Refine your preferences</summary>
+            <div className="preference-tray">
+              <span className="fineprint">KEEP WHAT YOU LIKE</span>
+              <div className="chips">
+                {session?.pins.map((p) => (
+                  <button className="selected" key={p} onClick={() => pin(p)}>
+                    <Pin size={12} />
                     {p}
+                    <PinOff size={12} />
                   </button>
                 ))}
-            </div>
-            <form
-              className="pin-form"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (pinDraft.trim()) pin(pinDraft.trim().slice(0, 60));
-                setPinDraft("");
-              }}
-            >
-              <input
-                aria-label="Add a preferred attribute"
-                value={pinDraft}
-                onChange={(e) => setPinDraft(e.target.value)}
-                placeholder="Add your own attribute"
-                maxLength={60}
-              />
-              <button aria-label="Pin attribute">
-                <Plus size={15} />
-              </button>
-            </form>
-            {stateLabels.length > 0 && (
-              <div className="active-rules">
-                {stateLabels.map((l) => (
-                  <span key={l}>
-                    <Check size={11} />
-                    {l}
-                  </span>
-                ))}
+                {["friendship", "problem-solving", "hope"]
+                  .filter((p) => !session?.pins.includes(p))
+                  .map((p) => (
+                    <button key={p} onClick={() => pin(p)}>
+                      <Plus size={12} />
+                      {p}
+                    </button>
+                  ))}
               </div>
-            )}
-            <div className="remix-buttons">
-              <button
-                disabled={busy || !session?.books.length}
-                onClick={() => send("Make it shorter")}
+              <form
+                className="pin-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (pinDraft.trim()) pin(pinDraft.trim().slice(0, 60));
+                  setPinDraft("");
+                }}
               >
-                Make it shorter
-              </button>
-              <button
-                disabled={busy || !session?.books.length}
-                onClick={() => send("Beginner friendly please")}
-              >
-                A gentler start
-              </button>
-              <button
-                disabled={busy || !session?.books.length}
-                onClick={() => send("No romance please")}
-              >
-                Less romance
-              </button>
+                <input
+                  aria-label="Add a preferred attribute"
+                  value={pinDraft}
+                  onChange={(e) => setPinDraft(e.target.value)}
+                  placeholder="Add your own attribute"
+                  maxLength={60}
+                />
+                <button aria-label="Pin attribute">
+                  <Plus size={15} />
+                </button>
+              </form>
+              {stateLabels.length > 0 && (
+                <div className="active-rules">
+                  {stateLabels.map((l) => (
+                    <span key={l}>
+                      <Check size={11} />
+                      {l}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="remix-buttons">
+                <button
+                  disabled={busy || !session?.books.length}
+                  onClick={() => send("Make it shorter")}
+                >
+                  Make it shorter
+                </button>
+                <button
+                  disabled={busy || !session?.books.length}
+                  onClick={() => send("Beginner friendly please")}
+                >
+                  A gentler start
+                </button>
+                <button
+                  disabled={busy || !session?.books.length}
+                  onClick={() => send("No romance please")}
+                >
+                  Less romance
+                </button>
+              </div>
             </div>
-          </div>
+          </details>
           {session?.books.length ? (
             <div className={"shortlist-grid " + (busy ? "updating" : "")}>
               {session.books.map((b) => (
@@ -443,6 +458,17 @@ function LibrarianInner() {
               </Link>
             </Empty>
           )}
+          <p className="web-search-entry">
+            <Link
+              className="text-link"
+              href={
+                "/search?source=web&q=" +
+                encodeURIComponent(session?.query || "")
+              }
+            >
+              Find more books on the web <ArrowUpRight size={14} />
+            </Link>
+          </p>
           {!!session?.learning_steps?.length && (
             <section className="generated-path">
               <span className="eyebrow">YOUR LEARNING SEQUENCE</span>
