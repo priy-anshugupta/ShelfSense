@@ -12,6 +12,7 @@ async function proxy(
     ![
       "config",
       "books",
+      "web-search",
       "recommendations",
       "me",
       "feedback",

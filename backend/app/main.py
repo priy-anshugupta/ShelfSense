@@ -178,6 +178,11 @@ def ready(db:Session=Depends(get_db)):
 async def config(owner=Depends(identity)):
     return {'demo':DEMO,'openai':configured(),'agent_roles':ROLES,'semantic':bool(os.getenv('EMBEDDING_MODEL')),'auth':True,'auth_provider':'supabase' if os.getenv('SUPABASE_URL') else 'local','staff':DEMO or owner.split(':',1)[1] in os.getenv('STAFF_USER_IDS','').split(','),'storage':'PostgreSQL' if os.getenv('DATABASE_URL','').startswith('postgres') else 'SQLite','owner_type':owner.split(':')[0]}
 
+@app.get('/api/v1/web-search')
+async def web_search(q:str='',owner=Depends(identity)):
+    from .web_search import search_books
+    return await search_books(q,owner)
+
 @app.get('/api/v1/books')
 def books(q:str='',genre:str='',mood:str='',level:str='',mode:str='',subject:str='',language:str='',branch:str='',max_pages:int|None=None,available_only:bool=False,featured_only:bool=False,route:str='familiar',limit:int=100,owner=Depends(identity),db:Session=Depends(get_db)):
     if len(q)>1500 or limit<1 or limit>100:
